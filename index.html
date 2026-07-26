@@ -195,6 +195,20 @@
     display: flex; align-items: center; gap: 14px;
     margin-bottom: 36px;
   }
+  .sec-head .more-link {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg-2);
+    padding: 4px 10px;
+    border: 1px solid var(--glass-bd);
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: color .2s, border-color .2s;
+  }
+  .sec-head .more-link:hover {
+    color: var(--accent-2);
+    border-color: var(--accent-2);
+  }
   .sec-head .num {
     font-family: var(--mono);
     color: var(--accent-2);
@@ -390,6 +404,7 @@
     </p>
     <div class="cta">
       <a class="btn primary" href="#publications">📄 View Publications</a>
+      <a class="btn ghost" href="https://scholar.google.com/citations?hl=zh-CN&user=N9Y21zgAAAAJ" target="_blank" rel="noopener">🎓 Google Scholar</a>
       <a class="btn ghost" href="#about">👋 More About Me</a>
     </div>
   </div>
@@ -475,7 +490,9 @@
 <section id="publications">
   <div class="container">
     <div class="sec-head reveal">
-      <span class="num">03.</span><h3>Publications</h3><div class="line"></div>
+      <span class="num">03.</span><h3>Publications</h3>
+      <a class="more-link" href="https://scholar.google.com/citations?hl=zh-CN&user=N9Y21zgAAAAJ" target="_blank" rel="noopener">完整列表 → Scholar</a>
+      <div class="line"></div>
     </div>
     <div class="pub-list">
 
