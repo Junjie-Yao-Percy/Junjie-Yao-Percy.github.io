@@ -318,9 +318,19 @@
   .pub .tag.ccf   { background: #1e40af; }
   .pub .tag.under { background: #6b7280; }
   .pub .tag.venue { background: #047857; }
-  .pub .title    { font-style: italic; color: var(--fg-0); }
+  .pub .title    { font-style: italic; color: var(--fg-0); border-bottom: 1px dashed transparent; transition: color .2s, border-color .2s; }
+  .pub .title:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
+  .pub .title::after { content: ' ↗'; font-style: normal; font-size: 0.85em; opacity: 0.6; }
   .pub .mine     { font-weight: 700; color: var(--fg-0); }
   .pub .where    { color: var(--fg-1); font-weight: 600; }
+  .pub .summary  {
+    margin-top: 8px;
+    color: var(--fg-1);
+    font-size: 13px;
+    line-height: 1.55;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-2);
+  }
 
   /* ============================================================
      11.  Awards + Patents
@@ -499,36 +509,41 @@
       <div class="pub glass reveal">
         <span class="tag q1">SCI Q1 · ESI</span>
         Zhu G., <b>Shen S. L., Yao J.</b>, et al.
-        <span class="title">Automatic lightweight networks for real-time road crack detection with DPSO</span>.
+        <a class="title" href="https://www.sciencedirect.com/science/article/abs/pii/S1474034625005038" target="_blank" rel="noopener">Automatic lightweight networks for real-time road crack detection with DPSO</a>.
         <span class="where">Advanced Engineering Informatics</span>, 2025, 68: 103610. <span class="tag venue">JCR Q1 TOP</span>
+        <p class="summary">面向路面裂缝实时检测,提出基于离散粒子群优化(DPSO)的轻量化网络自动搜索方法,在保持检测精度的同时显著降低模型参数量与计算开销,可在嵌入式设备上实时推理。</p>
       </div>
 
       <div class="pub glass reveal">
         <span class="tag ccf">CCF-C</span>
         <b>Yao J.</b>, Zhu G., Zhuang J., et al.
-        <span class="title">U-Shaped Network Based on Particle Swarm Optimization for Retinal Vessel Segmentation</span>.
+        <a class="title" href="https://ieeexplore.ieee.org/document/11043060" target="_blank" rel="noopener">U-Shaped Network Based on Particle Swarm Optimization for Retinal Vessel Segmentation</a>.
         <span class="where">2025 IEEE Congress on Evolutionary Computation (CEC)</span>, 2025: 1–8.
+        <p class="summary">首次将粒子群优化(PSO)用于自动搜索 U 型编解码分割网络的超参数与结构,在多个视网膜血管公开数据集上取得优于人工调参 U-Net 的精度,降低了对专家经验的依赖。</p>
       </div>
 
       <div class="pub glass reveal">
         <span class="tag venue">IEEE</span>
         Yin Y., Zhu G., <b>Yao J.</b>, et al.
-        <span class="title">Domain-Generalized Road Crack Segmentation Via Causal-Inspired Channel Attention</span>.
+        <a class="title" href="https://ieeexplore.ieee.org/document/11545303" target="_blank" rel="noopener">Domain-Generalized Road Crack Segmentation Via Causal-Inspired Channel Attention</a>.
         <span class="where">2026 6th International Symposium on Intelligent Robotics and Systems (ISoIRS)</span>, IEEE, 2026: 1–6.
+        <p class="summary">针对不同城市、不同采集设备间道路裂缝分割模型泛化能力差的问题,设计因果启发的通道注意力模块,显式分离域不变结构特征与域相关纹理特征,提升在未见域上的分割稳定性。</p>
       </div>
 
       <div class="pub glass reveal">
         <span class="tag venue">IEEE</span>
         Huang J., Wang Z., Li W., <b>Yao J.</b>, et al.
-        <span class="title">A Causality-Guided Adaptive Dual-Population Evolutionary Algorithm for Constrained Multi-Objective Optimization</span>.
+        <a class="title" href="https://ieeexplore.ieee.org/document/11351801" target="_blank" rel="noopener">A Causality-Guided Adaptive Dual-Population Evolutionary Algorithm for Constrained Multi-Objective Optimization</a>.
         <span class="where">2025 International Conference on Machine Intelligence and Nature-Inspired Computing (MIND)</span>, IEEE, 2025: 217–222.
+        <p class="summary">把因果推断引入自适应双种群进化算法,处理带约束的多目标优化问题;通过因果引导的种群分工策略,在搜索效率、解的多样性以及对约束的处理能力之间取得更好平衡。</p>
       </div>
 
       <div class="pub glass reveal">
         <span class="tag venue">IEEE</span>
         Du Y., Zhu G., Yin Y., <b>Yao J.</b>, et al.
-        <span class="title">Design and Implementation of a Mobile Robot System for Road Crack Detection</span>.
+        <a class="title" href="https://ieeexplore.ieee.org/document/11487324" target="_blank" rel="noopener">Design and Implementation of a Mobile Robot System for Road Crack Detection</span>.
         <span class="where">2025 China Automation Congress (CAC)</span>, IEEE, 2025: 5665–5670.
+        <p class="summary">从算法到硬件,设计并实现了一套面向道路裂缝检测的移动机器人系统,集成图像采集、嵌入式模型推理与远程监控,在真实道路场景中验证了算法的可行性与工程可部署性。</p>
       </div>
 
       <div class="pub glass reveal">
