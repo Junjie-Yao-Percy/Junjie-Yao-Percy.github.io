@@ -1,0 +1,8 @@
+# preview & screenshot artifacts
+preview_*.png
+screenshot_*.png
+
+# scratch HTML
+_screenshot.html
+_shot.html
+resume.html
