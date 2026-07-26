@@ -318,9 +318,9 @@
   .pub .tag.ccf   { background: #1e40af; }
   .pub .tag.under { background: #6b7280; }
   .pub .tag.venue { background: #047857; }
-  .pub .title    { font-style: italic; color: var(--fg-0); border-bottom: 1px dashed transparent; transition: color .2s, border-color .2s; }
-  .pub .title:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
-  .pub .title::after { content: ' ↗'; font-style: normal; font-size: 0.85em; opacity: 0.6; }
+  .pub .title    { font-style: italic; color: var(--fg-0); transition: color .2s; }
+  .pub a.title:hover { color: var(--accent-2); }
+  .pub a.title::after { content: ' ↗'; font-style: normal; font-size: 0.85em; opacity: 0.6; margin-left: 2px; }
   .pub .mine     { font-weight: 700; color: var(--fg-0); }
   .pub .where    { color: var(--fg-1); font-weight: 600; }
   .pub .summary  {
@@ -430,20 +430,22 @@
     <div class="about-grid">
       <div class="about-text glass reveal" style="padding: 24px;">
         <p>
-          I'm a first-year master's student at <b>UESTC (电子科技大学)</b> majoring in
-          Computer Science &amp; Technology, working at the intersection of
-          <b>deep learning, computer vision, and efficient model deployment</b>.
+          I'm a first-year M.S. student at <b>UESTC (电子科技大学)</b> in Computer
+          Science, designing and deploying <b>efficient deep-learning systems</b> for
+          real-world perception tasks.
         </p>
         <p>
-          My research spans neural architecture search (NAS), attention mechanisms,
-          causal representation learning, and inference optimization on Ascend NPUs.
-          I care about models that don't just hit benchmark numbers, but actually
-          ship — to UAVs, edge devices, and autonomous systems.
+          My work sits at the intersection of <b>computer vision, neural architecture
+          search, and edge AI</b> — with recent focus on LLM inference optimization
+          on Ascend NPUs and embodied-AI simulation for urban infrastructure.
+          I aim to build models that don't just top benchmarks, but actually
+          <b>ship</b> — to UAVs, edge devices, and robots working in the field.
         </p>
-        <p>
-          Currently collaborating with <b>Guangming Lab (Shenzhen)</b> on vLLM
-          adaptation to Ascend NPUs, and with <b>Shenzhen Loop Area Institute</b> on embodied-AI
-          simulation for infrastructure maintenance.
+        <p style="margin-top:14px; color: var(--fg-2); font-size: 13px;">
+          Currently collaborating with <b style="color: var(--fg-1);">Guangming Lab (Shenzhen)</b>
+          on vLLM-Ascend adaptation, and with
+          <b style="color: var(--fg-1);">Shenzhen Loop Area Institute</b> on
+          embodied-AI simulation for road maintenance.
         </p>
       </div>
       <div class="about-info glass reveal">
@@ -541,7 +543,7 @@
       <div class="pub glass reveal">
         <span class="tag venue">IEEE</span>
         Du Y., Zhu G., Yin Y., <b>Yao J.</b>, et al.
-        <a class="title" href="https://ieeexplore.ieee.org/document/11487324" target="_blank" rel="noopener">Design and Implementation of a Mobile Robot System for Road Crack Detection</span>.
+        <a class="title" href="https://ieeexplore.ieee.org/document/11487324" target="_blank" rel="noopener">Design and Implementation of a Mobile Robot System for Road Crack Detection</a>.
         <span class="where">2025 China Automation Congress (CAC)</span>, IEEE, 2025: 5665–5670.
         <p class="summary">从算法到硬件,设计并实现了一套面向道路裂缝检测的移动机器人系统,集成图像采集、嵌入式模型推理与远程监控,在真实道路场景中验证了算法的可行性与工程可部署性。</p>
       </div>
