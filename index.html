@@ -1629,6 +1629,14 @@ const io = new IntersectionObserver(entries => {
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
+// ?noshow=1 — force-show all reveals (for screenshots)
+if (new URLSearchParams(location.search).get('noshow') === '1') {
+  document.querySelectorAll('.reveal').forEach(el => el.classList.add('show'));
+  const style = document.createElement('style');
+  style.textContent = '.reveal { opacity: 1 !important; transform: none !important; transition: none !important; }';
+  document.head.appendChild(style);
+}
+
 /* ============================================================
    Avatar mouse-parallax (About section)
    ============================================================ */
