@@ -302,6 +302,21 @@
      ============================================================ */
   .pub-list { display: flex; flex-direction: column; gap: 14px; }
 
+  .pub-note {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    background: rgba(245, 158, 11, 0.06);
+    border: 1px solid rgba(245, 158, 11, 0.30);
+    border-radius: 10px;
+    font-size: 13px; line-height: 1.55;
+    color: var(--fg-1);
+  }
+  .pub-note-icon { font-size: 17px; color: var(--accent-3); flex-shrink: 0; line-height: 1.4; }
+  .pub-note strong { color: var(--accent-3); }
+  .pub-note a { color: var(--accent-2); border-bottom: 1px dotted var(--accent-2); }
+  .pub-note a:hover { color: var(--accent-3); border-bottom-color: var(--accent-3); }
+
   /* ---- Card layout: cover + body ---- */
   .pub-card {
     display: grid;
@@ -698,6 +713,19 @@
       <a class="more-link" href="https://scholar.google.com/citations?hl=zh-CN&user=N9Y21zgAAAAJ" target="_blank" rel="noopener">完整列表 → Scholar</a>
       <div class="line"></div>
     </div>
+
+    <div class="pub-note reveal">
+      <span class="pub-note-icon">⚠️</span>
+      <div>
+        <strong>Citation note:</strong>
+        Publication metadata (author lists, DOIs, venues, page numbers) is auto-synced from
+        <em>CrossRef</em> and <em>Semantic Scholar</em> and has not been manually verified.
+        For accurate citation, please always cross-check with
+        <a href="https://scholar.google.com/citations?user=N9Y21zgAAAAJ" target="_blank" rel="noopener">Google Scholar ↗</a>
+        (especially author order and full author names, which sometimes differ across databases).
+      </div>
+    </div>
+
     <div class="pub-list">
 
       <article class="pub-card glass reveal" data-pub="aei-2025">
