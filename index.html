@@ -251,7 +251,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 32px;
-    align-items: start;
+    align-items: center;
   }
   .about-text p {
     color: var(--fg-1);
@@ -260,13 +260,36 @@
     line-height: 1.65;
   }
   .about-text p b { color: var(--fg-0); }
-  .about-info { padding: 18px 20px; }
-  .about-info dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 14px; font-size: 13px; }
-  .about-info dt { color: var(--fg-2); font-family: var(--mono); font-size: 11px; }
-  .about-info dd { color: var(--fg-0); }
+
+  .about-meta {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 12px;
+    row-gap: 6px;
+    align-items: baseline;
+    font-size: 12.5px;
+    line-height: 1.4;
+    margin: 0 0 8px;
+  }
+  .about-meta .k {
+    color: var(--accent-2);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 1.2px;
+  }
+  .about-meta a { color: var(--fg-0); border-bottom: 1px dotted var(--glass-bd); }
+  .about-meta a:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
+  .about-currently {
+    color: var(--fg-2);
+    font-size: 12.5px;
+    line-height: 1.55;
+    margin-top: 6px;
+  }
+  .about-currently b { color: var(--fg-1); font-weight: 600; }
+  .about-info { padding: 18px 20px; }  /* legacy, unused */
 
   /* ---- Avatar frame (About right column) ---- */
-  .about-right { display: flex; flex-direction: column; gap: 14px; }
+  .about-right { display: flex; align-items: center; justify-content: center; }
 
   .avatar-frame {
     position: relative;
@@ -764,7 +787,7 @@
       <span class="num">01.</span><h3>About</h3><div class="line"></div>
     </div>
     <div class="about-grid">
-      <div class="about-text glass reveal" style="padding: 24px;">
+      <div class="about-text glass reveal" style="padding: 28px 30px;">
         <p>
           I'm a first-year M.S. student at <b>UESTC (电子科技大学)</b> in Computer
           Science, designing and deploying <b>efficient deep-learning systems</b> for
@@ -777,11 +800,21 @@
           I aim to build models that don't just top benchmarks, but actually
           <b>ship</b> — to UAVs, edge devices, and robots working in the field.
         </p>
-        <p style="margin-top:10px; color: var(--fg-2); font-size: 12.5px; line-height: 1.6;">
-          Currently with <b style="color: var(--fg-1);">Guangming Lab (Shenzhen)</b>
-          on vLLM-Ascend, and
-          <b style="color: var(--fg-1);">Shenzhen Loop Area Institute</b> on
-          embodied-AI simulation for road maintenance.
+        <hr style="border: none; border-top: 1px solid var(--border); margin: 16px 0 14px;">
+        <p class="about-meta">
+          <span class="k">BORN</span><span>2002-09</span>
+          <span class="k">FOCUS</span><span>CV · NAS · Edge AI · EAI</span>
+        </p>
+        <p class="about-meta">
+          <span class="k">EMAIL</span><span><a href="mailto:junjie_yao0209@163.com">junjie_yao0209@163.com</a></span>
+        </p>
+        <p class="about-meta">
+          <span class="k">PHONE</span><span>+86 158 7659 7569</span>
+          <span class="k">BASED IN</span><span>Guangzhou, China</span>
+        </p>
+        <p class="about-currently">
+          Currently with <b>Guangming Lab (Shenzhen)</b> on vLLM-Ascend, and
+          <b>Shenzhen Loop Area Institute</b> on embodied-AI simulation for road maintenance.
         </p>
       </div>
       <div class="about-right">
@@ -789,16 +822,6 @@
           <div class="avatar-glow"></div>
           <div class="avatar-border"></div>
           <img class="avatar-img" src="assets/avatar/cartoon.png" alt="Yao Junjie" />
-        </div>
-        <div class="about-info glass reveal">
-          <dl>
-            <dt>NAME</dt><dd>姚俊杰 / Yao Junjie</dd>
-            <dt>BORN</dt><dd>2002-09</dd>
-            <dt>FOCUS</dt><dd>CV · NAS · Edge AI · EAI</dd>
-            <dt>EMAIL</dt><dd style="font-size:13px; word-break:break-all;">junjie_yao0209@163.com</dd>
-            <dt>PHONE</dt><dd>+86 158 7659 7569</dd>
-            <dt>BASED IN</dt><dd>Guangzhou, China</dd>
-          </dl>
         </div>
       </div>
     </div>
