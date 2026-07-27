@@ -1227,6 +1227,26 @@
     transform: translate(4px, -4px);
     color: var(--accent-3);
   }
+  /* <button> element reset + click-to-copy feedback */
+  button.contact-email-btn {
+    font-family: inherit;
+    font-size: 14.5px;
+    line-height: 1;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+  }
+  button.contact-email-btn:focus-visible {
+    box-shadow: 0 0 0 2px rgba(16,185,129,0.4);
+  }
+  button.contact-email-btn.copied {
+    background: rgba(16,185,129,0.20);
+    border-color: var(--accent-2);
+    box-shadow: 0 6px 20px rgba(16,185,129,0.18);
+  }
+  button.contact-email-btn.copied .cr-v { color: var(--accent-2); }
+  button.contact-email-btn.copied .cr-arrow { color: var(--accent-2); transform: none; }
   .contact-extra {
     display: flex;
     gap: 10px;
@@ -2215,11 +2235,11 @@
       <h2 class="contact-headline">Let's <span class="hl-green">connect</span>.</h2>
       <p class="contact-subline">Open to research collaboration, internships, and project discussions. Don't be a stranger.</p>
 
-      <a class="contact-email-btn" href="mailto:junjie_yao0209@163.com">
+      <button type="button" class="contact-email-btn" data-copy="junjie_yao0209@163.com" aria-label="Copy email to clipboard">
         <span class="cr-k">Email</span>
         <span class="cr-v">junjie_yao0209@163.com</span>
         <span class="cr-arrow">↗</span>
-      </a>
+      </button>
 
       <div class="contact-extra">
         <a class="contact-extra-link" href="https://scholar.google.com/citations?user=N9Y21zgAAAAJ" target="_blank" rel="noopener">
@@ -2565,6 +2585,52 @@ citeCopyBtn.addEventListener('click', async () => {
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && modal.classList.contains('open')) closeCite();
+});
+
+/* ============================================================
+   Copy-to-clipboard for elements with [data-copy="..."]
+   - shows "Copied!" + checkmark for 1.5s, then reverts
+   - falls back to execCommand for non-secure contexts
+   ============================================================ */
+document.querySelectorAll('[data-copy]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const text = btn.dataset.copy;
+    if (!text) return;
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    } catch {
+      // Fallback for non-secure contexts (file://, http://, etc.)
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        ta.style.pointerEvents = 'none';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        ok = true;
+      } catch {}
+    }
+    if (!ok) return;
+    // Visual feedback
+    btn.classList.add('copied');
+    const v = btn.querySelector('.cr-v');
+    const arrow = btn.querySelector('.cr-arrow');
+    if (!v || !arrow) return;
+    const origV = v.textContent;
+    const origArrow = arrow.textContent;
+    v.textContent = 'Copied!';
+    arrow.textContent = '✓';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      v.textContent = origV;
+      arrow.textContent = origArrow;
+    }, 1500);
+  });
 });
 </script>
 
