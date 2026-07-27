@@ -689,65 +689,77 @@
     text-transform: uppercase;
   }
 
-  /* ---- contact strip (full width) ---- */
+  /* ---- GitHub activity widget (replaces contact strip) ---- */
   .bento-contact {
     padding: 0 !important;
     overflow: hidden;
   }
-  .contact-grid {
+  .gh-activity {
+    padding: 24px 28px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .gh-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .gh-head .bento-label { margin: 0; }
+  .gh-handle {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg-1);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--glass-bd);
+    padding-bottom: 1px;
+    transition: color .2s, border-color .2s;
+  }
+  .gh-handle:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
+  .gh-graph {
+    display: block;
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid var(--glass-bd);
+    transition: border-color .25s, transform .25s;
+  }
+  .gh-graph:hover {
+    border-color: var(--accent-2);
+    transform: translateY(-2px);
+  }
+  .gh-graph img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .gh-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    min-height: 88px;
+    gap: 12px;
   }
-  @media (max-width: 720px) {
-    .contact-grid { grid-template-columns: 1fr; }
-  }
-  .contact-cell {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 18px 24px;
-    color: var(--fg-0);
-    text-decoration: none;
-    transition: background .25s, color .25s;
-    border-right: 1px solid var(--glass-bd);
-  }
-  .contact-cell:last-child { border-right: 0; }
-  @media (max-width: 720px) {
-    .contact-cell { border-right: 0; border-bottom: 1px solid var(--glass-bd); }
-    .contact-cell:last-child { border-bottom: 0; }
-  }
-  .contact-cell:hover { background: rgba(16,185,129,0.06); color: var(--fg-0); }
-  .contact-cell:hover .cr-arrow { transform: translate(4px, -4px); color: var(--accent-3); }
-  .contact-cell:hover .cr-k { color: var(--accent-3); }
-  .contact-cell .cr-k {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--accent-2);
-    letter-spacing: 1.6px;
-    text-transform: uppercase;
-    transition: color .25s;
-    flex-shrink: 0;
-    width: 60px;
-  }
-  .contact-cell .cr-v {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--fg-0);
-    flex: 1;
-    min-width: 0;
+  .gh-stat {
+    display: block;
+    border-radius: 10px;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    border: 1px solid var(--glass-bd);
+    background: rgba(0,0,0,0.18);
+    transition: border-color .25s, transform .25s;
   }
-  .contact-cell .cr-arrow {
-    font-family: var(--mono);
-    font-size: 16px;
-    color: var(--fg-2);
-    transition: transform .3s cubic-bezier(0.34, 1.56, 0.64, 1), color .25s;
-    flex-shrink: 0;
+  .gh-stat:hover {
+    border-color: var(--accent-2);
+    transform: translateY(-2px);
+  }
+  .gh-stat img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  @media (max-width: 720px) {
+    .gh-stats { grid-template-columns: 1fr; }
   }
 
   /* ---- Avatar frame ---- */
@@ -1083,7 +1095,111 @@
   .evidence-video video::-webkit-media-controls-panel { background: linear-gradient(0deg, rgba(2,6,23,0.85), rgba(2,6,23,0)); }
 
   /* ============================================================
-     14.  Footer
+     14.  Contact (page-bottom section) + Footer
+     ============================================================ */
+  .contact-block {
+    text-align: center;
+    padding: 36px 20px 48px;
+  }
+  .contact-headline {
+    font-size: clamp(40px, 5.5vw, 64px);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    margin: 0 0 18px;
+    color: var(--fg-0);
+  }
+  .contact-headline .hl-green {
+    background: linear-gradient(135deg, #93c5fd 0%, #6ee7b7 60%, #facc15 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .contact-subline {
+    font-size: clamp(14px, 1.2vw, 16px);
+    color: var(--fg-1);
+    margin: 0 0 30px;
+    max-width: 52ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .contact-email-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 22px 14px 20px;
+    background: var(--glass-bg);
+    border: 1px solid rgba(16,185,129,0.45);
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--fg-0);
+    font-size: 14.5px;
+    transition: background .25s, border-color .25s, transform .25s, box-shadow .25s;
+    margin-bottom: 24px;
+  }
+  .contact-email-btn:hover {
+    background: rgba(16,185,129,0.10);
+    border-color: var(--accent-2);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(16,185,129,0.22);
+    color: var(--fg-0);
+  }
+  .contact-email-btn .cr-k {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--accent-2);
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .contact-email-btn .cr-v {
+    font-weight: 600;
+    letter-spacing: 0.1px;
+  }
+  .contact-email-btn .cr-arrow {
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--fg-2);
+    transition: transform .3s cubic-bezier(0.34, 1.56, 0.64, 1), color .25s;
+  }
+  .contact-email-btn:hover .cr-arrow {
+    transform: translate(4px, -4px);
+    color: var(--accent-3);
+  }
+  .contact-extra {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .contact-extra-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--fg-1);
+    border: 1px solid var(--glass-bd);
+    border-radius: 999px;
+    text-decoration: none;
+    transition: color .2s, border-color .2s, background .2s;
+  }
+  .contact-extra-link:hover {
+    color: var(--accent-2);
+    border-color: var(--accent-2);
+    background: rgba(16,185,129,0.06);
+  }
+  .contact-extra-static {
+    cursor: default;
+  }
+  .contact-extra-link .ce-icon {
+    font-size: 13px;
+  }
+
+  /* ============================================================
+     15.  Footer
      ============================================================ */
   footer {
     padding: 36px 0;
@@ -1218,6 +1334,7 @@
       <li><a href="#publications">Publications</a></li>
       <li><a href="#awards">Awards</a></li>
       <li><a href="#highlights">Highlights</a></li>
+      <li><a href="#contact">Contact</a></li>
     </ul>
   </div>
 </nav>
@@ -1354,23 +1471,26 @@
             </div>
           </div>
 
-          <!-- contact: 12 cols, full width strip -->
+          <!-- github activity: 12 cols, full width -->
           <div class="bento-contact glass reveal">
-            <div class="contact-grid">
-              <a class="contact-cell" href="mailto:junjie_yao0209@163.com">
-                <span class="cr-k">Email</span>
-                <span class="cr-v">junjie_yao0209@163.com</span>
-                <span class="cr-arrow">↗</span>
+            <div class="gh-activity">
+              <div class="gh-head">
+                <span class="bento-label">GitHub Activity</span>
+                <a class="gh-handle" href="https://github.com/Junjie-Yao-Percy" target="_blank" rel="noopener">@Junjie-Yao-Percy ↗</a>
+              </div>
+              <a class="gh-graph" href="https://github.com/Junjie-Yao-Percy" target="_blank" rel="noopener" aria-label="View GitHub profile">
+                <img src="https://github-readme-activity-graph.vercel.app/graph?username=Junjie-Yao-Percy&amp;theme=tokyo-night&amp;hide_border=true&amp;area=true&amp;radius=6&amp;height=320" alt="GitHub contribution activity over the past year" loading="lazy" />
               </a>
-              <a class="contact-cell" href="https://scholar.google.com/citations?user=N9Y21zgAAAAJ" target="_blank" rel="noopener">
-                <span class="cr-k">Scholar</span>
-                <span class="cr-v">Google Scholar · N9Y21zgAAAAJ</span>
-                <span class="cr-arrow">↗</span>
-              </a>
-              <div class="contact-cell">
-                <span class="cr-k">Base</span>
-                <span class="cr-v">Guangzhou, China</span>
-                <span class="cr-arrow">·</span>
+              <div class="gh-stats">
+                <a class="gh-stat" href="https://github.com/Junjie-Yao-Percy" target="_blank" rel="noopener" aria-label="GitHub stats">
+                  <img src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=Junjie-Yao-Percy&amp;theme=tokyonight&amp;hide_border=true" alt="GitHub stats" loading="lazy" />
+                </a>
+                <a class="gh-stat" href="https://github.com/Junjie-Yao-Percy" target="_blank" rel="noopener" aria-label="GitHub streak">
+                  <img src="https://streak-stats.demolab.com?user=Junjie-Yao-Percy&amp;theme=tokyonight&amp;hide_border=true&amp;background=00000000" alt="GitHub streak stats" loading="lazy" />
+                </a>
+                <a class="gh-stat" href="https://github.com/Junjie-Yao-Percy?tab=repositories" target="_blank" rel="noopener" aria-label="Top languages">
+                  <img src="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=Junjie-Yao-Percy&amp;theme=tokyonight&amp;hide_border=true" alt="Top languages" loading="lazy" />
+                </a>
               </div>
             </div>
           </div>
@@ -1636,6 +1756,38 @@
           <source src="videos/sflep-2023-award.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== CONTACT ============== -->
+<section id="contact">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="num">06.</span><h3>Contact</h3><div class="line"></div>
+    </div>
+
+    <div class="contact-block reveal">
+      <h2 class="contact-headline">Let's <span class="hl-green">connect</span>.</h2>
+      <p class="contact-subline">Open to research collaboration, internships, and project discussions. Don't be a stranger.</p>
+
+      <a class="contact-email-btn" href="mailto:junjie_yao0209@163.com">
+        <span class="cr-k">Email</span>
+        <span class="cr-v">junjie_yao0209@163.com</span>
+        <span class="cr-arrow">↗</span>
+      </a>
+
+      <div class="contact-extra">
+        <a class="contact-extra-link" href="https://scholar.google.com/citations?user=N9Y21zgAAAAJ" target="_blank" rel="noopener">
+          <span class="ce-icon">🎓</span> Google Scholar
+        </a>
+        <a class="contact-extra-link" href="https://github.com/Junjie-Yao-Percy" target="_blank" rel="noopener">
+          <span class="ce-icon">🐙</span> GitHub
+        </a>
+        <span class="contact-extra-link contact-extra-static">
+          <span class="ce-icon">📍</span> Guangzhou, China
+        </span>
       </div>
     </div>
   </div>
