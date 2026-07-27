@@ -249,18 +249,20 @@
      ============================================================ */
   .about-grid {
     display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
   }
   .about-text p {
     color: var(--fg-1);
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     font-size: 15px;
+    line-height: 1.65;
   }
   .about-text p b { color: var(--fg-0); }
-  .about-info { padding: 24px; }
-  .about-info dl { display: grid; grid-template-columns: max-content 1fr; gap: 10px 16px; font-size: 14px; }
-  .about-info dt { color: var(--fg-2); font-family: var(--mono); font-size: 12px; }
+  .about-info { padding: 18px 20px; }
+  .about-info dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 14px; font-size: 13px; }
+  .about-info dt { color: var(--fg-2); font-family: var(--mono); font-size: 11px; }
   .about-info dd { color: var(--fg-0); }
 
   /* ---- Avatar frame (About right column) ---- */
@@ -269,7 +271,7 @@
   .avatar-frame {
     position: relative;
     width: 100%;
-    max-width: 280px;
+    max-width: 340px;
     margin: 0 auto;
     aspect-ratio: 3 / 4;
     border-radius: 18px;
@@ -322,39 +324,12 @@
     opacity: 0.85;
     animation: avatar-border-flow 5s linear infinite;
   }
-  .avatar-overlay {
-    position: absolute; inset: 0; z-index: 5;
-    display: flex; align-items: flex-end; justify-content: center;
-    padding-bottom: 24px;
-    background: linear-gradient(0deg, rgba(2,6,23,0.85) 0%, rgba(2,6,23,0) 55%);
-    font-family: var(--mono);
-    font-size: 13px;
-    color: #fff;
-    letter-spacing: 1px;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .avatar-overlay span { transform: translateY(8px); transition: transform 0.3s; }
-
-  .avatar-pulse {
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 12px; height: 12px;
-    margin: -6px 0 0 -6px;
-    border-radius: 50%;
-    background: var(--accent-2);
-    z-index: 6;
-    box-shadow: 0 0 0 0 rgba(16,185,129,0.55);
-    pointer-events: none;
-  }
 
   .avatar-frame:hover {
     box-shadow: 0 30px 80px rgba(16,185,129,0.35), 0 0 0 1px rgba(16,185,129,0.4);
   }
   .avatar-frame:hover .avatar-img    { transform: scale(1.06); }
   .avatar-frame:hover .avatar-glow   { opacity: 0.85; }
-  .avatar-frame:hover .avatar-overlay { opacity: 1; }
-  .avatar-frame:hover .avatar-overlay span { transform: translateY(0); }
 
   @keyframes avatar-float {
     0%, 100% { transform: translate(var(--px), var(--py)) rotate(0deg); }
@@ -371,14 +346,6 @@
   @keyframes avatar-border-flow {
     0%   { background-position:   0% 50%; }
     100% { background-position: 300% 50%; }
-  }
-  @keyframes avatar-pulse-anim {
-    0%   { box-shadow: 0 0 0 0   rgba(16,185,129,0.55); }
-    70%  { box-shadow: 0 0 0 14px rgba(16,185,129,0);    }
-    100% { box-shadow: 0 0 0 0   rgba(16,185,129,0);    }
-  }
-  .avatar-frame:hover .avatar-pulse {
-    animation: avatar-pulse-anim 1.6s ease-out infinite;
   }
 
   /* ============================================================
@@ -810,9 +777,9 @@
           I aim to build models that don't just top benchmarks, but actually
           <b>ship</b> — to UAVs, edge devices, and robots working in the field.
         </p>
-        <p style="margin-top:14px; color: var(--fg-2); font-size: 13px;">
-          Currently collaborating with <b style="color: var(--fg-1);">Guangming Lab (Shenzhen)</b>
-          on vLLM-Ascend adaptation, and with
+        <p style="margin-top:10px; color: var(--fg-2); font-size: 12.5px; line-height: 1.6;">
+          Currently with <b style="color: var(--fg-1);">Guangming Lab (Shenzhen)</b>
+          on vLLM-Ascend, and
           <b style="color: var(--fg-1);">Shenzhen Loop Area Institute</b> on
           embodied-AI simulation for road maintenance.
         </p>
@@ -822,8 +789,6 @@
           <div class="avatar-glow"></div>
           <div class="avatar-border"></div>
           <img class="avatar-img" src="assets/avatar/cartoon.png" alt="Yao Junjie" />
-          <div class="avatar-overlay"><span>// 真实的我</span></div>
-          <div class="avatar-pulse"></div>
         </div>
         <div class="about-info glass reveal">
           <dl>
