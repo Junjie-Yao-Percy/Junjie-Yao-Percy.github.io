@@ -1773,6 +1773,14 @@ if (new URLSearchParams(location.search).get('noshow') === '1') {
   const style = document.createElement('style');
   style.textContent = '.reveal { opacity: 1 !important; transform: none !important; transition: none !important; }';
   document.head.appendChild(style);
+  // ?sec=about — also auto-scroll to a section (for screenshot tooling)
+  const sec = new URLSearchParams(location.search).get('sec');
+  if (sec) {
+    setTimeout(() => {
+      const el = document.getElementById(sec);
+      if (el) el.scrollIntoView({ block: 'start' });
+    }, 200);
+  }
 }
 
 /* ============================================================
