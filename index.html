@@ -245,51 +245,392 @@
   }
 
   /* ============================================================
-     8.  About
+     8.  About  —  editorial bento (magazine-style)
      ============================================================ */
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    align-items: center;
-  }
-  .about-text p {
-    color: var(--fg-1);
-    margin-bottom: 12px;
-    font-size: 15px;
-    line-height: 1.65;
-  }
-  .about-text p b { color: var(--fg-0); }
 
-  .about-meta {
+  /* outer stage: vertical sidebar + main column */
+  .about-stage {
     display: grid;
-    grid-template-columns: max-content 1fr;
-    column-gap: 12px;
-    row-gap: 6px;
-    align-items: baseline;
-    font-size: 12.5px;
-    line-height: 1.4;
-    margin: 0 0 8px;
+    grid-template-columns: 56px 1fr;
+    gap: 28px;
+    align-items: start;
   }
-  .about-meta .k {
-    color: var(--accent-2);
+  .about-side {
+    position: sticky;
+    top: 90px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding-top: 6px;
+  }
+  .about-side-num {
     font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: 1.2px;
+    font-size: 11px;
+    color: var(--accent-3);
+    letter-spacing: 2px;
   }
-  .about-meta a { color: var(--fg-0); border-bottom: 1px dotted var(--glass-bd); }
-  .about-meta a:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
-  .about-currently {
+  .about-side-label {
+    font-family: var(--mono);
+    font-size: 10px;
     color: var(--fg-2);
-    font-size: 12.5px;
-    line-height: 1.55;
+    letter-spacing: 4px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-transform: uppercase;
+  }
+  .about-side-line {
+    width: 1px;
+    flex: 1;
+    min-height: 80px;
+    background: linear-gradient(180deg,
+      var(--accent-1) 0%,
+      var(--accent-2) 50%,
+      transparent 100%);
+    opacity: 0.6;
+  }
+  @media (max-width: 800px) {
+    .about-stage { grid-template-columns: 1fr; gap: 18px; }
+    .about-side {
+      position: static;
+      flex-direction: row;
+      gap: 10px;
+      padding: 0;
+    }
+    .about-side-label { writing-mode: horizontal-tb; transform: none; }
+    .about-side-line { width: 60px; height: 1px; min-height: 0;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2), transparent); }
+  }
+
+  /* ---- editor head: huge name + status + tagline ---- */
+  .about-head { margin-bottom: 36px; max-width: 880px; }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px 5px 10px;
+    margin-bottom: 22px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--accent-2);
+    background: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.30);
+    border-radius: 999px;
+    transition: all .3s;
+  }
+  .status-pill:hover {
+    background: rgba(16,185,129,0.14);
+    border-color: var(--accent-2);
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 0 0 rgba(16,185,129,0.6);
+    animation: status-pulse 1.8s ease-out infinite;
+  }
+  @keyframes status-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.6); }
+    70%  { box-shadow: 0 0 0 9px rgba(16,185,129,0); }
+    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+  }
+
+  .about-name {
+    font-size: clamp(48px, 7.5vw, 104px);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    margin: 0 0 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .name-zh {
+    background: linear-gradient(135deg, #ffffff 0%, #93c5fd 55%, #6ee7b7 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .name-en {
+    font-size: 0.34em;
+    font-weight: 500;
+    color: var(--fg-2);
+    -webkit-text-fill-color: var(--fg-2);
+    letter-spacing: -0.01em;
+    font-family: var(--mono);
     margin-top: 6px;
   }
-  .about-currently b { color: var(--fg-1); font-weight: 600; }
-  .about-info { padding: 18px 20px; }  /* legacy, unused */
 
-  /* ---- Avatar frame (About right column) ---- */
-  .about-right { display: flex; align-items: center; justify-content: center; }
+  .about-tagline {
+    font-size: clamp(15px, 1.3vw, 17.5px);
+    line-height: 1.55;
+    color: var(--fg-1);
+    margin: 22px 0 0;
+    max-width: 64ch;
+  }
+  .about-tagline em {
+    font-style: normal;
+    color: var(--fg-0);
+    border-bottom: 1px solid rgba(245,158,11,0.4);
+    padding-bottom: 1px;
+  }
+
+  /* ---- bento grid: asymmetric 12-col ---- */
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-areas:
+      "quote quote quote quote quote quote quote quote avatar avatar avatar avatar"
+      "quote quote quote quote quote quote quote quote avatar avatar avatar avatar"
+      "focus focus focus focus currently currently currently currently stats stats stats stats"
+      "contact contact contact contact contact contact contact contact contact contact contact contact";
+    gap: 14px;
+  }
+  .bento-quote     { grid-area: quote; }
+  .bento-avatar    { grid-area: avatar; padding: 0; background: transparent; border: 0; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .bento-focus     { grid-area: focus; }
+  .bento-currently { grid-area: currently; }
+  .bento-stats     { grid-area: stats; }
+  .bento-contact   { grid-area: contact; }
+
+  @media (max-width: 1024px) {
+    .bento {
+      grid-template-areas:
+        "quote quote quote quote quote quote quote quote quote quote quote quote"
+        "avatar avatar avatar avatar avatar avatar avatar avatar avatar avatar avatar avatar"
+        "focus focus focus focus focus focus currently currently currently currently currently currently"
+        "stats stats stats stats stats stats contact contact contact contact contact contact";
+    }
+  }
+  @media (max-width: 720px) {
+    .bento {
+      grid-template-areas:
+        "avatar avatar avatar avatar avatar avatar avatar avatar avatar avatar avatar avatar"
+        "quote quote quote quote quote quote quote quote quote quote quote quote"
+        "focus focus focus focus focus focus focus focus focus focus focus focus"
+        "currently currently currently currently currently currently currently currently currently currently currently currently"
+        "stats stats stats stats stats stats stats stats stats stats stats stats"
+        "contact contact contact contact contact contact contact contact contact contact contact contact";
+    }
+  }
+
+  /* shared bento card */
+  .bento > .glass { padding: 22px 24px; position: relative; overflow: hidden; }
+  .bento-label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--accent-2);
+    letter-spacing: 1.8px;
+    margin: 0 0 14px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bento-label::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: var(--accent-2);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-2);
+  }
+
+  /* ---- quote (signature) ---- */
+  .bento-quote { padding: 30px 32px !important; }
+  .quote-mark {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 130px;
+    font-weight: 700;
+    line-height: 0.6;
+    color: var(--accent-2);
+    opacity: 0.18;
+    position: absolute;
+    top: 18px; left: 24px;
+    pointer-events: none;
+    user-select: none;
+  }
+  .quote-text {
+    font-size: clamp(17px, 1.4vw, 19px);
+    line-height: 1.45;
+    color: var(--fg-0);
+    margin: 0 0 16px;
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+  }
+  .quote-text em {
+    font-style: normal;
+    color: var(--accent-2);
+    font-weight: 700;
+    background: linear-gradient(180deg, transparent 65%, rgba(16,185,129,0.18) 65%);
+  }
+  .quote-sub {
+    font-size: 13.5px;
+    color: var(--fg-2);
+    line-height: 1.65;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    max-width: 56ch;
+  }
+  .quote-sub b { color: var(--fg-0); font-weight: 600; }
+
+  /* ---- avatar cell (transparent, no glass) ---- */
+  .bento-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bento-avatar .avatar-frame {
+    margin: 0;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  /* ---- focus tags (pills) ---- */
+  .focus-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .focus-tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(16,185,129,0.10);
+    border: 1px solid rgba(16,185,129,0.30);
+    color: var(--accent-2);
+    letter-spacing: 0.3px;
+    transition: all .2s;
+  }
+  .focus-tag:hover {
+    background: rgba(16,185,129,0.20);
+    border-color: var(--accent-2);
+    transform: translateY(-1px);
+  }
+
+  /* ---- currently ---- */
+  .bento-currently p {
+    color: var(--fg-1);
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .bento-currently b { color: var(--fg-0); font-weight: 600; }
+  .bento-currently .org {
+    color: var(--accent-3);
+    font-weight: 600;
+  }
+
+  /* ---- stats (animated counters) ---- */
+  .bento-stats {
+    display: flex;
+    flex-direction: column;
+  }
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 14px;
+    margin-top: 4px;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-num {
+    font-family: var(--sans);
+    font-size: clamp(28px, 3.4vw, 38px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    background: linear-gradient(180deg, #ffffff 0%, #93c5fd 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-num .stat-suffix {
+    font-size: 0.5em;
+    color: var(--accent-3);
+    -webkit-text-fill-color: var(--accent-3);
+    font-weight: 600;
+    margin-left: 1px;
+  }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--fg-2);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  /* ---- contact strip (full width) ---- */
+  .bento-contact {
+    padding: 0 !important;
+    overflow: hidden;
+  }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    min-height: 88px;
+  }
+  @media (max-width: 720px) {
+    .contact-grid { grid-template-columns: 1fr; }
+  }
+  .contact-cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 24px;
+    color: var(--fg-0);
+    text-decoration: none;
+    transition: background .25s, color .25s;
+    border-right: 1px solid var(--glass-bd);
+  }
+  .contact-cell:last-child { border-right: 0; }
+  @media (max-width: 720px) {
+    .contact-cell { border-right: 0; border-bottom: 1px solid var(--glass-bd); }
+    .contact-cell:last-child { border-bottom: 0; }
+  }
+  .contact-cell:hover { background: rgba(16,185,129,0.06); color: var(--fg-0); }
+  .contact-cell:hover .cr-arrow { transform: translate(4px, -4px); color: var(--accent-3); }
+  .contact-cell:hover .cr-k { color: var(--accent-3); }
+  .contact-cell .cr-k {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent-2);
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    transition: color .25s;
+    flex-shrink: 0;
+    width: 60px;
+  }
+  .contact-cell .cr-v {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg-0);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .contact-cell .cr-arrow {
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--fg-2);
+    transition: transform .3s cubic-bezier(0.34, 1.56, 0.64, 1), color .25s;
+    flex-shrink: 0;
+  }
+
+  /* ---- Avatar frame ---- */
 
   .avatar-frame {
     position: relative;
@@ -786,45 +1127,119 @@
     <div class="sec-head reveal">
       <span class="num">01.</span><h3>About</h3><div class="line"></div>
     </div>
-    <div class="about-grid">
-      <div class="about-text glass reveal" style="padding: 28px 30px;">
-        <p>
-          I'm a first-year M.S. student at <b>UESTC (电子科技大学)</b> in Computer
-          Science, designing and deploying <b>efficient deep-learning systems</b> for
-          real-world perception tasks.
-        </p>
-        <p>
-          My work sits at the intersection of <b>computer vision, neural architecture
-          search, and edge AI</b> — with recent focus on LLM inference optimization
-          on Ascend NPUs and embodied-AI simulation for urban infrastructure.
-          I aim to build models that don't just top benchmarks, but actually
-          <b>ship</b> — to UAVs, edge devices, and robots working in the field.
-        </p>
-        <hr style="border: none; border-top: 1px solid var(--border); margin: 16px 0 14px;">
-        <p class="about-meta">
-          <span class="k">BORN</span><span>2002-09</span>
-          <span class="k">FOCUS</span><span>CV · NAS · Edge AI · EAI</span>
-        </p>
-        <p class="about-meta">
-          <span class="k">EMAIL</span><span><a href="mailto:junjie_yao0209@163.com">junjie_yao0209@163.com</a></span>
-        </p>
-        <p class="about-meta">
-          <span class="k">PHONE</span><span>+86 158 7659 7569</span>
-          <span class="k">BASED IN</span><span>Guangzhou, China</span>
-        </p>
-        <p class="about-currently">
-          Currently with <b>Guangming Lab (Shenzhen)</b> on vLLM-Ascend, and
-          <b>Shenzhen Loop Area Institute</b> on embodied-AI simulation for road maintenance.
-        </p>
-      </div>
-      <div class="about-right">
-        <div class="avatar-frame glass reveal" id="avatar">
-          <div class="avatar-glow"></div>
-          <div class="avatar-border"></div>
-          <img class="avatar-img" src="assets/avatar/cartoon.png" alt="Yao Junjie" />
+
+    <div class="about-stage">
+      <!-- left vertical sidebar -->
+      <aside class="about-side reveal" aria-hidden="true">
+        <div class="about-side-num">01</div>
+        <div class="about-side-label">about · me</div>
+        <div class="about-side-line"></div>
+      </aside>
+
+      <!-- main column -->
+      <div class="about-main">
+
+        <!-- editor head -->
+        <div class="about-head reveal">
+          <span class="status-pill">
+            <span class="status-dot"></span>
+            Open to research collaboration · 2026
+          </span>
+          <h2 class="about-name">
+            <span class="name-zh">姚俊杰</span>
+            <span class="name-en">Yao Junjie</span>
+          </h2>
+          <p class="about-tagline">
+            M.S. in Computer Science at <em>UESTC</em>. I design and deploy
+            <em>efficient deep-learning systems</em> for real-world perception —
+            from <em>neural architecture search</em> to <em>embodied AI on edge devices</em>.
+            My models don't just top benchmarks, they ship to UAVs, edge boxes, and robots in the field.
+          </p>
         </div>
-      </div>
-    </div>
+
+        <!-- bento grid -->
+        <div class="bento">
+
+          <!-- quote: 7 cols, 2 rows -->
+          <div class="bento-quote glass reveal">
+            <span class="quote-mark" aria-hidden="true">"</span>
+            <p class="quote-text">Designing and deploying <em>efficient deep-learning systems</em> for real-world perception — from <em>neural architecture search</em> to <em>embodied AI on edge devices</em>.</p>
+            <p class="quote-sub">My work sits at the intersection of <b>computer vision</b>, <b>NAS</b>, <b>edge AI</b> and <b>embodied AI</b>. I aim to build models that don't just top benchmarks, but actually <b>ship</b> to UAVs, edge devices, and robots in the field.</p>
+          </div>
+
+          <!-- avatar: 5 cols, 2 rows (tall) -->
+          <div class="bento-avatar reveal">
+            <div class="avatar-frame" id="avatar">
+              <div class="avatar-glow"></div>
+              <div class="avatar-border"></div>
+              <img class="avatar-img" src="assets/avatar/cartoon.png" alt="Yao Junjie" />
+            </div>
+          </div>
+
+          <!-- focus: 4 cols, 2 rows -->
+          <div class="bento-focus glass reveal">
+            <h5 class="bento-label">Focus</h5>
+            <div class="focus-tags">
+              <span class="focus-tag">Computer Vision</span>
+              <span class="focus-tag">Neural Architecture Search</span>
+              <span class="focus-tag">Edge AI</span>
+              <span class="focus-tag">Embodied AI</span>
+            </div>
+          </div>
+
+          <!-- currently: 4 cols, 1 row -->
+          <div class="bento-currently glass reveal">
+            <h5 class="bento-label">Currently</h5>
+            <p>Research intern at <span class="org">Guangming Lab (Shenzhen)</span> on vLLM-Ascend adaptation, and at <span class="org">Shenzhen Loop Area Institute</span> on embodied-AI simulation for road maintenance.</p>
+          </div>
+
+          <!-- stats: 4 cols, 1 row -->
+          <div class="bento-stats glass reveal">
+            <h5 class="bento-label">By the numbers</h5>
+            <div class="stats-row">
+              <div class="stat">
+                <div class="stat-num" data-target="5" data-suffix="">0</div>
+                <div class="stat-label">Publications</div>
+              </div>
+              <div class="stat">
+                <div class="stat-num" data-target="2" data-suffix="">0</div>
+                <div class="stat-label">Internships</div>
+              </div>
+              <div class="stat">
+                <div class="stat-num" data-target="4" data-suffix="">0</div>
+                <div class="stat-label">Patents</div>
+              </div>
+              <div class="stat">
+                <div class="stat-num" data-target="4" data-suffix="">0</div>
+                <div class="stat-label">Awards</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- contact: 12 cols, full width strip -->
+          <div class="bento-contact glass reveal">
+            <div class="contact-grid">
+              <a class="contact-cell" href="mailto:junjie_yao0209@163.com">
+                <span class="cr-k">Email</span>
+                <span class="cr-v">junjie_yao0209@163.com</span>
+                <span class="cr-arrow">↗</span>
+              </a>
+              <a class="contact-cell" href="https://scholar.google.com/citations?user=N9Y21zgAAAAJ" target="_blank" rel="noopener">
+                <span class="cr-k">Scholar</span>
+                <span class="cr-v">Google Scholar · N9Y21zgAAAAJ</span>
+                <span class="cr-arrow">↗</span>
+              </a>
+              <div class="contact-cell">
+                <span class="cr-k">Base</span>
+                <span class="cr-v">Guangzhou, China</span>
+                <span class="cr-arrow">·</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.bento -->
+      </div><!-- /.about-main -->
+    </div><!-- /.about-stage -->
   </div>
 </section>
 
@@ -1190,6 +1605,24 @@ const io = new IntersectionObserver(entries => {
   for (const e of entries) {
     if (e.isIntersecting) {
       e.target.classList.add('show');
+      // count-up if the element has stat counters
+      e.target.querySelectorAll('.stat-num').forEach(el => {
+        if (el.dataset.target && !el.dataset.run) {
+          el.dataset.run = '1';
+          const target = parseInt(el.dataset.target, 10) || 0;
+          const suffix = el.dataset.suffix || '';
+          const dur = 1200;
+          const start = performance.now();
+          const step = (now) => {
+            const t = Math.min(1, (now - start) / dur);
+            const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+            const val = Math.round(eased * target);
+            el.textContent = val + suffix;
+            if (t < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        }
+      });
       io.unobserve(e.target);
     }
   }
