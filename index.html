@@ -315,52 +315,43 @@
     aspect-ratio: 3 / 4.2;
     border-radius: 10px;
     overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between;
-    padding: 16px 14px;
     text-decoration: none;
     color: #fff;
+    background: var(--bg-1);
     transition: transform .25s, box-shadow .25s;
   }
-  .pub-cover:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
-  .pub-cover-bg {
+  .pub-cover:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.55); }
+  .pub-cover-img {
     position: absolute; inset: 0; z-index: 0;
-  }
-  .pub-cover-q1   .pub-cover-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 35%, #10b981 75%, #f59e0b 100%); }
-  .pub-cover-ccf  .pub-cover-bg { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #06b6d4 100%); }
-  .pub-cover-venue .pub-cover-bg { background: linear-gradient(135deg, #064e3b 0%, #10b981 45%, #3b82f6 100%); }
-  .pub-cover::before {
-    content: ''; position: absolute; inset: 0; z-index: 1;
-    background:
-      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.18) 0%, transparent 60%),
-      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-    background-size: auto, 18px 18px, 18px 18px;
-    pointer-events: none;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
   }
   .pub-cover-badge {
-    position: relative; z-index: 2;
+    position: absolute; top: 10px; left: 10px; z-index: 2;
     font-family: var(--mono); font-size: 10px; font-weight: 700;
     padding: 3px 8px; border-radius: 4px;
-    background: rgba(0,0,0,0.4); color: #fff;
-    align-self: flex-start;
-    letter-spacing: 0.8px;
-  }
-  .pub-cover-title {
-    position: relative; z-index: 2;
-    font-size: 19px; font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -0.5px;
     color: #fff;
-    text-shadow: 0 1px 6px rgba(0,0,0,0.3);
-    margin-top: auto;
+    letter-spacing: 0.8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.45);
   }
-  .pub-cover-year {
-    position: relative; z-index: 2;
-    font-family: var(--mono); font-size: 13px;
-    color: rgba(255,255,255,0.85);
+  .pub-cover-badge-q1    { background: linear-gradient(90deg, #dc2626, #f59e0b); }
+  .pub-cover-badge-ccf   { background: #1e40af; }
+  .pub-cover-badge-venue { background: #047857; }
+  .pub-cover-overlay {
+    position: absolute; inset: 0; z-index: 3;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(2, 6, 23, 0.78);
+    color: #fff;
+    font-family: var(--mono); font-size: 14px; font-weight: 600;
     letter-spacing: 1px;
-    text-align: right;
+    opacity: 0;
+    transition: opacity .25s;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
   }
+  .pub-cover:hover .pub-cover-overlay { opacity: 1; }
 
   .pub-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
   .pub-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13px; line-height: 1.4; }
@@ -710,11 +701,10 @@
     <div class="pub-list">
 
       <article class="pub-card glass reveal" data-pub="aei-2025">
-        <a class="pub-cover pub-cover-q1" href="papers/aei-2025-dpso.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
-          <div class="pub-cover-bg"></div>
-          <span class="pub-cover-badge">SCI Q1</span>
-          <div class="pub-cover-title">DPSO<br>Road Crack</div>
-          <div class="pub-cover-year">2025</div>
+        <a class="pub-cover" href="papers/aei-2025-dpso.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
+          <img class="pub-cover-img" src="papers/covers/aei-2025-1.png" alt="AEI 2025 — first page of paper" loading="lazy" />
+          <span class="pub-cover-badge pub-cover-badge-q1">SCI Q1</span>
+          <div class="pub-cover-overlay">📄 Open PDF</div>
         </a>
         <div class="pub-body">
           <div class="pub-meta">
@@ -733,11 +723,10 @@
       </article>
 
       <article class="pub-card glass reveal" data-pub="cec-2025">
-        <a class="pub-cover pub-cover-ccf" href="papers/cec-2025-psounet.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
-          <div class="pub-cover-bg"></div>
-          <span class="pub-cover-badge">CCF-C</span>
-          <div class="pub-cover-title">PSO U-Net<br>Retinal Vessel</div>
-          <div class="pub-cover-year">2025</div>
+        <a class="pub-cover" href="papers/cec-2025-psounet.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
+          <img class="pub-cover-img" src="papers/covers/cec-2025-1.png" alt="CEC 2025 — first page of paper" loading="lazy" />
+          <span class="pub-cover-badge pub-cover-badge-ccf">CCF-C</span>
+          <div class="pub-cover-overlay">📄 Open PDF</div>
         </a>
         <div class="pub-body">
           <div class="pub-meta">
@@ -756,11 +745,10 @@
       </article>
 
       <article class="pub-card glass reveal" data-pub="isoirs-2026">
-        <a class="pub-cover pub-cover-venue" href="papers/isoirs-2026-causal.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
-          <div class="pub-cover-bg"></div>
-          <span class="pub-cover-badge">IEEE</span>
-          <div class="pub-cover-title">Causal Channel<br>Crack</div>
-          <div class="pub-cover-year">2026</div>
+        <a class="pub-cover" href="papers/isoirs-2026-causal.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
+          <img class="pub-cover-img" src="papers/covers/isoirs-2026-1.png" alt="ISoIRS 2026 — first page of paper" loading="lazy" />
+          <span class="pub-cover-badge pub-cover-badge-venue">IEEE</span>
+          <div class="pub-cover-overlay">📄 Open PDF</div>
         </a>
         <div class="pub-body">
           <div class="pub-meta">
@@ -779,11 +767,10 @@
       </article>
 
       <article class="pub-card glass reveal" data-pub="mind-2025">
-        <a class="pub-cover pub-cover-venue" href="papers/mind-2025-cmop.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
-          <div class="pub-cover-bg"></div>
-          <span class="pub-cover-badge">IEEE</span>
-          <div class="pub-cover-title">Causal<br>Dual-Pop<br>Evolution</div>
-          <div class="pub-cover-year">2025</div>
+        <a class="pub-cover" href="papers/mind-2025-cmop.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
+          <img class="pub-cover-img" src="papers/covers/mind-2025-1.png" alt="MIND 2025 — first page of paper" loading="lazy" />
+          <span class="pub-cover-badge pub-cover-badge-venue">IEEE</span>
+          <div class="pub-cover-overlay">📄 Open PDF</div>
         </a>
         <div class="pub-body">
           <div class="pub-meta">
@@ -802,11 +789,10 @@
       </article>
 
       <article class="pub-card glass reveal" data-pub="cac-2025">
-        <a class="pub-cover pub-cover-venue" href="papers/cac-2025-crack-robot.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
-          <div class="pub-cover-bg"></div>
-          <span class="pub-cover-badge">IEEE</span>
-          <div class="pub-cover-title">Crack<br>Robot<br>System</div>
-          <div class="pub-cover-year">2025</div>
+        <a class="pub-cover" href="papers/cac-2025-crack-robot.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
+          <img class="pub-cover-img" src="papers/covers/cac-2025-1.png" alt="CAC 2025 — first page of paper" loading="lazy" />
+          <span class="pub-cover-badge pub-cover-badge-venue">IEEE</span>
+          <div class="pub-cover-overlay">📄 Open PDF</div>
         </a>
         <div class="pub-body">
           <div class="pub-meta">
