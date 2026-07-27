@@ -300,7 +300,117 @@
   /* ============================================================
      10.  Publications
      ============================================================ */
-  .pub-list { display: flex; flex-direction: column; gap: 12px; }
+  .pub-list { display: flex; flex-direction: column; gap: 14px; }
+
+  /* ---- Card layout: cover + body ---- */
+  .pub-card {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 22px;
+    padding: 18px;
+    align-items: stretch;
+  }
+  .pub-cover {
+    position: relative;
+    aspect-ratio: 3 / 4.2;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 16px 14px;
+    text-decoration: none;
+    color: #fff;
+    transition: transform .25s, box-shadow .25s;
+  }
+  .pub-cover:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+  .pub-cover-bg {
+    position: absolute; inset: 0; z-index: 0;
+  }
+  .pub-cover-q1   .pub-cover-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 35%, #10b981 75%, #f59e0b 100%); }
+  .pub-cover-ccf  .pub-cover-bg { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #06b6d4 100%); }
+  .pub-cover-venue .pub-cover-bg { background: linear-gradient(135deg, #064e3b 0%, #10b981 45%, #3b82f6 100%); }
+  .pub-cover::before {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.18) 0%, transparent 60%),
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: auto, 18px 18px, 18px 18px;
+    pointer-events: none;
+  }
+  .pub-cover-badge {
+    position: relative; z-index: 2;
+    font-family: var(--mono); font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 4px;
+    background: rgba(0,0,0,0.4); color: #fff;
+    align-self: flex-start;
+    letter-spacing: 0.8px;
+  }
+  .pub-cover-title {
+    position: relative; z-index: 2;
+    font-size: 19px; font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+    margin-top: auto;
+  }
+  .pub-cover-year {
+    position: relative; z-index: 2;
+    font-family: var(--mono); font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 1px;
+    text-align: right;
+  }
+
+  .pub-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .pub-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13px; line-height: 1.4; }
+  .pub-meta .tag { margin-right: 4px; }
+  .pub-authors { color: var(--fg-1); }
+  .pub-authors b { color: var(--fg-0); }
+  .pub-title-link {
+    flex: 1 1 100%;
+    font-style: italic; color: var(--fg-0);
+    font-size: 15px; font-weight: 600;
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .pub-title-link:hover { color: var(--accent-2); }
+  .pub-venue { color: var(--fg-2); font-size: 12.5px; font-family: var(--mono); }
+  .pub-summary {
+    margin: 4px 0 0;
+    color: var(--fg-1);
+    font-size: 13.5px; line-height: 1.55;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-2);
+  }
+  .pub-actions { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .btn-pub {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px;
+    font-family: var(--mono); font-size: 12px; font-weight: 600;
+    border-radius: 6px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-bd);
+    color: var(--fg-0);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .2s;
+  }
+  .btn-pub:hover {
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+    background: rgba(16,185,129,0.06);
+  }
+  .btn-pub[data-cite]:hover {
+    border-color: var(--accent-3);
+    color: var(--accent-3);
+    background: rgba(245,158,11,0.06);
+  }
+
+  @media (max-width: 720px) {
+    .pub-card { grid-template-columns: 1fr; }
+    .pub-cover { aspect-ratio: 16/9; }
+  }
   .pub {
     padding: 16px 18px;
     font-size: 14px;
@@ -377,7 +487,96 @@
   .reveal.show { opacity: 1; transform: translateY(0); }
 
   /* ============================================================
-     16.  Responsive
+     16.  Cite modal
+     ============================================================ */
+  .cite-modal {
+    position: fixed; inset: 0; z-index: 200;
+    display: none;
+    align-items: center; justify-content: center;
+  }
+  .cite-modal.open { display: flex; }
+  .cite-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(2, 6, 23, 0.78);
+    backdrop-filter: blur(6px);
+  }
+  .cite-dialog {
+    position: relative;
+    width: min(640px, calc(100vw - 32px));
+    max-height: calc(100vh - 60px);
+    background: var(--bg-1);
+    border: 1px solid var(--glass-bd);
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    padding: 22px 22px 18px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .cite-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .cite-head h4 { font-size: 16px; font-weight: 700; color: var(--fg-0); }
+  .cite-close {
+    width: 30px; height: 30px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-bd);
+    border-radius: 6px;
+    color: var(--fg-1);
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .cite-close:hover { color: var(--accent-3); border-color: var(--accent-3); }
+  .cite-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+  .cite-tab {
+    padding: 5px 12px;
+    font-family: var(--mono); font-size: 12px; font-weight: 600;
+    border-radius: 5px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-bd);
+    color: var(--fg-1);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .cite-tab.active { color: var(--accent-2); border-color: var(--accent-2); background: rgba(16,185,129,0.08); }
+  .cite-tab:not(.active):hover { color: var(--fg-0); }
+  .cite-body {
+    position: relative;
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    max-height: 320px;
+    overflow: auto;
+  }
+  .cite-body pre {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--fg-0);
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .cite-foot { display: flex; gap: 8px; justify-content: flex-end; }
+  .cite-copy {
+    padding: 7px 18px;
+    font-family: var(--mono); font-size: 12.5px; font-weight: 700;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .cite-copy:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(16,185,129,0.35); }
+  .cite-copy.copied { background: linear-gradient(90deg, var(--accent-2), var(--accent-3)); }
+  .cite-meta-info { font-size: 12px; color: var(--fg-2); font-family: var(--mono); margin-bottom: 8px; }
+
+  /* ============================================================
+     17.  Responsive
      ============================================================ */
   @media (max-width: 800px) {
     .about-grid, .grid-2 { grid-template-columns: 1fr; }
@@ -510,54 +709,129 @@
     </div>
     <div class="pub-list">
 
-      <div class="pub glass reveal">
-        <span class="tag q1">SCI Q1 · ESI</span>
-        Zhu G., <b>Shen S. L., Yao J.</b>, et al.
-        <a class="title" href="https://www.sciencedirect.com/science/article/abs/pii/S1474034625005038" target="_blank" rel="noopener">Automatic lightweight networks for real-time road crack detection with DPSO</a>.
-        <span class="where">Advanced Engineering Informatics</span>, 2025, 68: 103610. <span class="tag venue">JCR Q1 TOP</span>
-        <p class="summary">We propose a lightweight network auto-search method based on Discrete Particle Swarm Optimization (DPSO) for real-time road crack detection. The approach significantly reduces model size and compute cost while maintaining detection accuracy, enabling real-time inference on embedded devices.</p>
-      </div>
+      <article class="pub-card glass reveal" data-pub="aei-2025">
+        <a class="pub-cover pub-cover-q1" href="papers/aei-2025-dpso.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
+          <div class="pub-cover-bg"></div>
+          <span class="pub-cover-badge">SCI Q1</span>
+          <div class="pub-cover-title">DPSO<br>Road Crack</div>
+          <div class="pub-cover-year">2025</div>
+        </a>
+        <div class="pub-body">
+          <div class="pub-meta">
+            <span class="tag q1">SCI Q1 · ESI</span>
+            <span class="pub-authors">Zhu G., <b>Shen S. L., Yao J.</b>, et al.</span>
+            <a class="pub-title-link" href="https://www.sciencedirect.com/science/article/abs/pii/S1474034625005038" target="_blank" rel="noopener">Automatic lightweight networks for real-time road crack detection with DPSO</a>
+            <span class="pub-venue">Adv. Eng. Informatics · 2025, 68: 103610 · JCR Q1 TOP</span>
+          </div>
+          <p class="pub-summary">We propose a lightweight network auto-search method based on Discrete Particle Swarm Optimization (DPSO) for real-time road crack detection. The approach significantly reduces model size and compute cost while maintaining detection accuracy, enabling real-time inference on embedded devices.</p>
+          <div class="pub-actions">
+            <a class="btn-pub" href="papers/aei-2025-dpso.pdf" target="_blank" rel="noopener">📄 PDF</a>
+            <button class="btn-pub" data-cite="aei-2025">📋 Cite</button>
+            <a class="btn-pub" href="https://www.sciencedirect.com/science/article/abs/pii/S1474034625005038" target="_blank" rel="noopener">↗ Read</a>
+          </div>
+        </div>
+      </article>
 
-      <div class="pub glass reveal">
-        <span class="tag ccf">CCF-C</span>
-        <b>Yao J.</b>, Zhu G., Zhuang J., et al.
-        <a class="title" href="https://ieeexplore.ieee.org/document/11043060" target="_blank" rel="noopener">U-Shaped Network Based on Particle Swarm Optimization for Retinal Vessel Segmentation</a>.
-        <span class="where">2025 IEEE Congress on Evolutionary Computation (CEC)</span>, 2025: 1–8.
-        <p class="summary">First work to apply Particle Swarm Optimization (PSO) to jointly search the hyperparameters and architecture of U-shaped encoder–decoder segmentation networks. Outperforms hand-tuned U-Net on multiple public retinal vessel datasets, reducing reliance on expert prior knowledge.</p>
-      </div>
+      <article class="pub-card glass reveal" data-pub="cec-2025">
+        <a class="pub-cover pub-cover-ccf" href="papers/cec-2025-psounet.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
+          <div class="pub-cover-bg"></div>
+          <span class="pub-cover-badge">CCF-C</span>
+          <div class="pub-cover-title">PSO U-Net<br>Retinal Vessel</div>
+          <div class="pub-cover-year">2025</div>
+        </a>
+        <div class="pub-body">
+          <div class="pub-meta">
+            <span class="tag ccf">CCF-C</span>
+            <span class="pub-authors"><b>Yao J.</b>, Zhu G., Zhuang J., et al.</span>
+            <a class="pub-title-link" href="https://ieeexplore.ieee.org/document/11043060" target="_blank" rel="noopener">U-Shaped Network Based on Particle Swarm Optimization for Retinal Vessel Segmentation</a>
+            <span class="pub-venue">IEEE CEC 2025 · 1–8</span>
+          </div>
+          <p class="pub-summary">First work to apply Particle Swarm Optimization (PSO) to jointly search the hyperparameters and architecture of U-shaped encoder–decoder segmentation networks. Outperforms hand-tuned U-Net on multiple public retinal vessel datasets, reducing reliance on expert prior knowledge.</p>
+          <div class="pub-actions">
+            <a class="btn-pub" href="papers/cec-2025-psounet.pdf" target="_blank" rel="noopener">📄 PDF</a>
+            <button class="btn-pub" data-cite="cec-2025">📋 Cite</button>
+            <a class="btn-pub" href="https://ieeexplore.ieee.org/document/11043060" target="_blank" rel="noopener">↗ Read</a>
+          </div>
+        </div>
+      </article>
 
-      <div class="pub glass reveal">
-        <span class="tag venue">IEEE</span>
-        Yin Y., Zhu G., <b>Yao J.</b>, et al.
-        <a class="title" href="https://ieeexplore.ieee.org/document/11545303" target="_blank" rel="noopener">Domain-Generalized Road Crack Segmentation Via Causal-Inspired Channel Attention</a>.
-        <span class="where">2026 6th International Symposium on Intelligent Robotics and Systems (ISoIRS)</span>, IEEE, 2026: 1–6.
-        <p class="summary">To address the poor cross-domain generalization of road crack segmentation across cities and acquisition devices, we design a causality-inspired channel attention module that explicitly disentangles domain-invariant structural features from domain-specific texture features, improving segmentation stability on unseen domains.</p>
-      </div>
+      <article class="pub-card glass reveal" data-pub="isoirs-2026">
+        <a class="pub-cover pub-cover-venue" href="papers/isoirs-2026-causal.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
+          <div class="pub-cover-bg"></div>
+          <span class="pub-cover-badge">IEEE</span>
+          <div class="pub-cover-title">Causal Channel<br>Crack</div>
+          <div class="pub-cover-year">2026</div>
+        </a>
+        <div class="pub-body">
+          <div class="pub-meta">
+            <span class="tag venue">IEEE</span>
+            <span class="pub-authors">Yin Y., Zhu G., <b>Yao J.</b>, et al.</span>
+            <a class="pub-title-link" href="https://ieeexplore.ieee.org/document/11545303" target="_blank" rel="noopener">Domain-Generalized Road Crack Segmentation Via Causal-Inspired Channel Attention</a>
+            <span class="pub-venue">ISoIRS 2026 · IEEE · 1–6</span>
+          </div>
+          <p class="pub-summary">To address the poor cross-domain generalization of road crack segmentation across cities and acquisition devices, we design a causality-inspired channel attention module that explicitly disentangles domain-invariant structural features from domain-specific texture features, improving segmentation stability on unseen domains.</p>
+          <div class="pub-actions">
+            <a class="btn-pub" href="papers/isoirs-2026-causal.pdf" target="_blank" rel="noopener">📄 PDF</a>
+            <button class="btn-pub" data-cite="isoirs-2026">📋 Cite</button>
+            <a class="btn-pub" href="https://ieeexplore.ieee.org/document/11545303" target="_blank" rel="noopener">↗ Read</a>
+          </div>
+        </div>
+      </article>
 
-      <div class="pub glass reveal">
-        <span class="tag venue">IEEE</span>
-        Huang J., Wang Z., Li W., <b>Yao J.</b>, et al.
-        <a class="title" href="https://ieeexplore.ieee.org/document/11351801" target="_blank" rel="noopener">A Causality-Guided Adaptive Dual-Population Evolutionary Algorithm for Constrained Multi-Objective Optimization</a>.
-        <span class="where">2025 International Conference on Machine Intelligence and Nature-Inspired Computing (MIND)</span>, IEEE, 2025: 217–222.
-        <p class="summary">We incorporate causal inference into an adaptive dual-population evolutionary algorithm for constrained multi-objective optimization. A causality-guided population division strategy achieves a better trade-off between search efficiency, solution diversity, and constraint handling.</p>
-      </div>
+      <article class="pub-card glass reveal" data-pub="mind-2025">
+        <a class="pub-cover pub-cover-venue" href="papers/mind-2025-cmop.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
+          <div class="pub-cover-bg"></div>
+          <span class="pub-cover-badge">IEEE</span>
+          <div class="pub-cover-title">Causal<br>Dual-Pop<br>Evolution</div>
+          <div class="pub-cover-year">2025</div>
+        </a>
+        <div class="pub-body">
+          <div class="pub-meta">
+            <span class="tag venue">IEEE</span>
+            <span class="pub-authors">Huang J., Wang Z., Li W., <b>Yao J.</b>, et al.</span>
+            <a class="pub-title-link" href="https://ieeexplore.ieee.org/document/11351801" target="_blank" rel="noopener">A Causality-Guided Adaptive Dual-Population Evolutionary Algorithm for Constrained Multi-Objective Optimization</a>
+            <span class="pub-venue">MIND 2025 · IEEE · 217–222</span>
+          </div>
+          <p class="pub-summary">We incorporate causal inference into an adaptive dual-population evolutionary algorithm for constrained multi-objective optimization. A causality-guided population division strategy achieves a better trade-off between search efficiency, solution diversity, and constraint handling.</p>
+          <div class="pub-actions">
+            <a class="btn-pub" href="papers/mind-2025-cmop.pdf" target="_blank" rel="noopener">📄 PDF</a>
+            <button class="btn-pub" data-cite="mind-2025">📋 Cite</button>
+            <a class="btn-pub" href="https://ieeexplore.ieee.org/document/11351801" target="_blank" rel="noopener">↗ Read</a>
+          </div>
+        </div>
+      </article>
 
-      <div class="pub glass reveal">
-        <span class="tag venue">IEEE</span>
-        Du Y., Zhu G., Yin Y., <b>Yao J.</b>, et al.
-        <a class="title" href="https://ieeexplore.ieee.org/document/11487324" target="_blank" rel="noopener">Design and Implementation of a Mobile Robot System for Road Crack Detection</a>.
-        <span class="where">2025 China Automation Congress (CAC)</span>, IEEE, 2025: 5665–5670.
-        <p class="summary">From algorithm to hardware, we design and implement a mobile robot system for road crack detection that integrates image acquisition, embedded model inference, and remote monitoring. Field tests on real-world road scenes validate the feasibility and engineering deployability of the proposed approach.</p>
-      </div>
+      <article class="pub-card glass reveal" data-pub="cac-2025">
+        <a class="pub-cover pub-cover-venue" href="papers/cac-2025-crack-robot.pdf" target="_blank" rel="noopener" aria-label="Open PDF">
+          <div class="pub-cover-bg"></div>
+          <span class="pub-cover-badge">IEEE</span>
+          <div class="pub-cover-title">Crack<br>Robot<br>System</div>
+          <div class="pub-cover-year">2025</div>
+        </a>
+        <div class="pub-body">
+          <div class="pub-meta">
+            <span class="tag venue">IEEE</span>
+            <span class="pub-authors">Du Y., Zhu G., Yin Y., <b>Yao J.</b>, et al.</span>
+            <a class="pub-title-link" href="https://ieeexplore.ieee.org/document/11487324" target="_blank" rel="noopener">Design and Implementation of a Mobile Robot System for Road Crack Detection</a>
+            <span class="pub-venue">CAC 2025 · IEEE · 5665–5670</span>
+          </div>
+          <p class="pub-summary">From algorithm to hardware, we design and implement a mobile robot system for road crack detection that integrates image acquisition, embedded model inference, and remote monitoring. Field tests on real-world road scenes validate the feasibility and engineering deployability of the proposed approach.</p>
+          <div class="pub-actions">
+            <a class="btn-pub" href="papers/cac-2025-crack-robot.pdf" target="_blank" rel="noopener">📄 PDF</a>
+            <button class="btn-pub" data-cite="cac-2025">📋 Cite</button>
+            <a class="btn-pub" href="https://ieeexplore.ieee.org/document/11487324" target="_blank" rel="noopener">↗ Read</a>
+          </div>
+        </div>
+      </article>
 
-      <div class="pub glass reveal">
+      <div class="pub glass reveal" style="padding: 16px 18px;">
         <span class="tag under">Under Review</span>
         Wang M., Chen R., <b>Yao J.</b>, Zhuang J., Fan Z., Zhu G.
         <span class="title">LiteCrackNAS: A Lightweight Neural Architecture Search Framework with a Diversity-Aware Strategy for Pavement Crack Detection</span>.
         <span class="where">Computer-Aided Civil and Infrastructure Engineering</span>.
       </div>
 
-      <div class="pub glass reveal">
+      <div class="pub glass reveal" style="padding: 16px 18px;">
         <span class="tag under">To Submit</span>
         <b>Yao J.</b>, Zhu G., Zhuang J., et al.
         <span class="title">Causal Feature Disentanglement for Domain-Generalized Road Crack Segmentation</span>.
@@ -615,6 +889,29 @@
     <p style="margin-top:6px; font-size:12px;">© 2026 姚俊杰 · All rights reserved.</p>
   </div>
 </footer>
+
+<!-- ============== CITE MODAL ============== -->
+<div class="cite-modal" id="cite-modal" role="dialog" aria-labelledby="cite-title" aria-modal="true">
+  <div class="cite-backdrop" data-cite-close></div>
+  <div class="cite-dialog glass">
+    <div class="cite-head">
+      <h4 id="cite-title">📋 Cite this paper</h4>
+      <button class="cite-close" data-cite-close aria-label="Close">✕</button>
+    </div>
+    <div class="cite-meta-info" id="cite-meta">—</div>
+    <div class="cite-tabs" role="tablist">
+      <button class="cite-tab active" data-format="bibtex" role="tab">BibTeX</button>
+      <button class="cite-tab" data-format="apa" role="tab">APA</button>
+      <button class="cite-tab" data-format="mla" role="tab">MLA</button>
+    </div>
+    <div class="cite-body">
+      <pre id="cite-content">—</pre>
+    </div>
+    <div class="cite-foot">
+      <button class="cite-copy" id="cite-copy">📋 Copy</button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ============================================================
@@ -692,6 +989,156 @@ const io = new IntersectionObserver(entries => {
   }
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ============================================================
+   Cite modal — Google Scholar-style citation generator
+   ============================================================ */
+const CITES = {
+  'aei-2025': {
+    title:  'Automatic lightweight networks for real-time road crack detection with DPSO',
+    authors:'Zhu, G., Shen, S. L., Yao, J., Zhuang, J., Yin, Y., & Du, Y.',
+    venue:  'Advanced Engineering Informatics',
+    year:   2025,
+    vol:    '68',
+    pages:  '103610',
+    type:   'article',
+    publisher: 'Elsevier'
+  },
+  'cec-2025': {
+    title:  'U-Shaped Network Based on Particle Swarm Optimization for Retinal Vessel Segmentation',
+    authors:'Yao, J., Zhu, G., Zhuang, J., & Wang, M.',
+    venue:  '2025 IEEE Congress on Evolutionary Computation (CEC)',
+    year:   2025,
+    pages:  '1–8',
+    type:   'inproceedings',
+    publisher: 'IEEE'
+  },
+  'isoirs-2026': {
+    title:  'Domain-Generalized Road Crack Segmentation Via Causal-Inspired Channel Attention',
+    authors:'Yin, Y., Zhu, G., Yao, J., Du, Y., & Zhuang, J.',
+    venue:  '2026 6th International Symposium on Intelligent Robotics and Systems (ISoIRS)',
+    year:   2026,
+    pages:  '1–6',
+    type:   'inproceedings',
+    publisher: 'IEEE'
+  },
+  'mind-2025': {
+    title:  'A Causality-Guided Adaptive Dual-Population Evolutionary Algorithm for Constrained Multi-Objective Optimization',
+    authors:'Huang, J., Wang, Z., Li, W., Yao, J., & Zhu, G.',
+    venue:  '2025 International Conference on Machine Intelligence and Nature-Inspired Computing (MIND)',
+    year:   2025,
+    pages:  '217–222',
+    type:   'inproceedings',
+    publisher: 'IEEE'
+  },
+  'cac-2025': {
+    title:  'Design and Implementation of a Mobile Robot System for Road Crack Detection',
+    authors:'Du, Y., Zhu, G., Yin, Y., Yao, J., & Huang, J.',
+    venue:  '2025 China Automation Congress (CAC)',
+    year:   2025,
+    pages:  '5665–5670',
+    type:   'inproceedings',
+    publisher: 'IEEE'
+  }
+};
+
+function makeCiteKey(c) {
+  const first = c.authors.split(',')[0].split(' ').pop().toLowerCase().replace(/[^a-z]/g, '');
+  return first + c.year + (c.title.split(' ')[0] || 'paper').toLowerCase();
+}
+function toBibTeX(c) {
+  const key = makeCiteKey(c);
+  if (c.type === 'article') {
+    return [
+      `@article{${key},`,
+      `  title  = {${c.title}},`,
+      `  author = {${c.authors}},`,
+      `  journal= {${c.venue}},`,
+      `  volume = {${c.vol}},`,
+      `  pages  = {${c.pages}},`,
+      `  year   = {${c.year}},`,
+      `  publisher = {${c.publisher}}`,
+      `}`
+    ].join('\n');
+  }
+  return [
+    `@inproceedings{${key},`,
+    `  title    = {${c.title}},`,
+    `  author   = {${c.authors}},`,
+    `  booktitle= {${c.venue}},`,
+    `  pages    = {${c.pages}},`,
+    `  year     = {${c.year}},`,
+    `  publisher= {${c.publisher}}`,
+    `}`
+  ].join('\n');
+}
+function toAPA(c) {
+  const volStr = c.vol ? `, ${c.vol}` : '';
+  if (c.type === 'article') {
+    return `${c.authors} (${c.year}). ${c.title}. ${c.venue}${volStr}, ${c.pages}.`;
+  }
+  return `${c.authors} (${c.year}). ${c.title}. In ${c.venue} (pp. ${c.pages}). ${c.publisher}.`;
+}
+function toMLA(c) {
+  if (c.type === 'article') {
+    return `${c.authors} "${c.title}." ${c.venue}, vol. ${c.vol}, ${c.year}, pp. ${c.pages}.`;
+  }
+  return `${c.authors} "${c.title}." ${c.venue}, ${c.year}, pp. ${c.pages}.`;
+}
+
+const modal       = document.getElementById('cite-modal');
+const citeContent = document.getElementById('cite-content');
+const citeMeta    = document.getElementById('cite-meta');
+const citeCopyBtn = document.getElementById('cite-copy');
+let currentCite   = null;
+let currentFormat = 'bibtex';
+
+function renderCite() {
+  if (!currentCite) return;
+  const c = CITES[currentCite];
+  citeMeta.textContent  = `${c.authors} · ${c.venue}, ${c.year}`;
+  const fns = { bibtex: toBibTeX, apa: toAPA, mla: toMLA };
+  citeContent.textContent = fns[currentFormat](c);
+}
+function openCite(key) {
+  currentCite   = key;
+  currentFormat = 'bibtex';
+  document.querySelectorAll('.cite-tab').forEach(t => t.classList.toggle('active', t.dataset.format === 'bibtex'));
+  renderCite();
+  modal.classList.add('open');
+}
+function closeCite() { modal.classList.remove('open'); currentCite = null; }
+
+document.querySelectorAll('[data-cite]').forEach(btn => {
+  btn.addEventListener('click', e => { e.preventDefault(); openCite(btn.dataset.cite); });
+});
+document.querySelectorAll('[data-cite-close]').forEach(el => {
+  el.addEventListener('click', closeCite);
+});
+document.querySelectorAll('.cite-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.cite-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentFormat = tab.dataset.format;
+    renderCite();
+  });
+});
+citeCopyBtn.addEventListener('click', async () => {
+  const text = citeContent.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  citeCopyBtn.classList.add('copied');
+  citeCopyBtn.textContent = '✓ Copied';
+  setTimeout(() => { citeCopyBtn.classList.remove('copied'); citeCopyBtn.textContent = '📋 Copy'; }, 1600);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && modal.classList.contains('open')) closeCite();
+});
 </script>
 
 </body>
