@@ -119,7 +119,10 @@ function renderHero() {
     <header class="hero">
       <div>
         <div class="greeting">${escapeHtml(hero.greeting)}</div>
-        <h1>${escapeHtml(hero.nameZh)} <span class="hero-name-en">/ ${escapeHtml(hero.nameEn)}</span></h1>
+        <h1 class="scramble-name" data-scramble-zh="${escapeHtml(hero.nameZh)}" data-scramble-en="${escapeHtml(hero.nameEn)}" title="Click to scramble">
+          <span class="hero-name-zh"></span>
+          <span class="hero-name-en">/ <span class="hero-name-en-inner"></span></span>
+        </h1>
         <h2>${escapeHtml(hero.degree)} <span class="tag">${escapeHtml(hero.school)}</span></h2>
         <p class="sub">${escapeHtml(hero.summary)}</p>
         <div class="cta">
@@ -128,10 +131,6 @@ function renderHero() {
           <a class="btn ghost" href="#about">👋 More About Me</a>
         </div>
       </div>
-      <button class="scroll-hint" type="button" aria-label="Click or press any key to scroll down">
-        <span class="sh-label">Press any key · or click to scroll</span>
-        <span class="sh-cursor" aria-hidden="true">▌</span>
-      </button>
     </header>`;
 }
 
@@ -376,11 +375,6 @@ function renderFooterAndModal() {
     </div>`;
 }
 
-// Lock body scroll on first load so wheel/touch scrolling is
-// blocked until the user clicks the bottom hint or presses any key.
-// (Hero content is still visible — just can't scroll past it.)
-document.body.classList.add('intro-active');
-
 function renderSite() {
   document.title = SITE.meta.title;
   const root = document.getElementById('site-root');
@@ -541,48 +535,82 @@ if (new URLSearchParams(location.search).get('noshow') === '1') {
 })();
 
 /* ============================================================
-   "Press any key" hint at the bottom of the hero
-   - On first load, body scroll is locked (set above).
-   - click on hint OR any key press dismisses the hint,
-     unlocks body scroll, smooth-scrolls to #about.
-   - Nav anchor links also unlock body scroll so the user
-     can navigate freely after clicking a nav item.
-   - User CAN still scroll with mouse wheel / touch AFTER
-     unlocking — but not before.
+   Name scramble — "terminal / cyberpunk" reveal
+   - On load: 姚俊杰 and "Yao Junjie" cycle through random
+     chars and resolve to the final text with a per-character
+     stagger (wave from left to right).
+   - On click: re-trigger the same animation.
+   - No body lock, no button — purely visual.
    ============================================================ */
-function unlockIntro() {
-  document.body.classList.remove('intro-active');
+const SCRAMBLE_CHARS_CN =
+  '的一是了我不在人们有这个就那好都一上也能到他要会着没自己对于和着要中下以为所以哦啊呢嗯哈呀哇呃哎哟嗨喂呀呜哦噢哈嘻';
+const SCRAMBLE_CHARS_EN =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+
+function scrambleText(el, finalText, opts = {}) {
+  if (!el) return;
+  if (el._scrambleRAF) cancelAnimationFrame(el._scrambleRAF);
+
+  const duration = opts.duration ?? 1200;
+  const pool = opts.pool || SCRAMBLE_CHARS_EN;
+  const preserveSpace = opts.preserveSpace !== false;
+
+  // Treat each "logical" char (handles Chinese 1 char = 1 unit, not 3 bytes).
+  const target = Array.from(finalText);
+  const isSpace = (c) => c === ' ' || c === '\u00A0';
+  const pickRandom = () => pool[Math.floor(Math.random() * pool.length)];
+  const displayed = target.map(c => (preserveSpace && isSpace(c)) ? c : pickRandom());
+  el.textContent = displayed.join('');
+
+  // Per-character resolve time, staggered from left to right.
+  // Slight randomness so it doesn't look mechanical.
+  const resolveAt = target.map((_, i) => {
+    const base = 0.18 + (i / Math.max(1, target.length - 1)) * 0.7;
+    return duration * Math.min(1, Math.max(0, base + (Math.random() - 0.5) * 0.08));
+  });
+
+  const start = performance.now();
+  const tick = () => {
+    const elapsed = performance.now() - start;
+    let allDone = true;
+    for (let i = 0; i < target.length; i++) {
+      if (preserveSpace && isSpace(target[i])) continue;
+      if (elapsed >= resolveAt[i]) {
+        displayed[i] = target[i];
+      } else {
+        displayed[i] = pickRandom();
+        allDone = false;
+      }
+    }
+    el.textContent = displayed.join('');
+    if (allDone) {
+      el.textContent = finalText;
+      el._scrambleRAF = null;
+    } else {
+      el._scrambleRAF = requestAnimationFrame(tick);
+    }
+  };
+  el._scrambleRAF = requestAnimationFrame(tick);
 }
 
-// Nav links unlock the intro so the user can navigate directly
-// from the nav if they want (instead of pressing a key first).
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-  link.addEventListener('click', () => unlockIntro());
-});
-
 (function () {
-  const hint = document.querySelector('.scroll-hint');
-  if (!hint) return;
-  let dismissed = false;
-  const dismiss = () => {
-    if (dismissed) return;
-    dismissed = true;
-    hint.classList.add('dismissed');
-    setTimeout(() => hint.remove(), 500);
-    unlockIntro();
-    const target = document.getElementById('about');
-    if (target) target.scrollIntoView({ behavior: 'smooth' });
-    document.removeEventListener('keydown', onKey);
-  };
-  hint.addEventListener('click', e => { e.preventDefault(); dismiss(); });
-  const isPrintable = (k) => k.length === 1 || ['Enter', 'Space', 'ArrowDown', 'ArrowUp', 'Tab', 'Escape'].includes(k);
-  const onKey = (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-    if (!isPrintable(e.key)) return;
-    dismiss();
-  };
-  document.addEventListener('keydown', onKey);
+  const zh = document.querySelector('.hero-name-zh');
+  const en = document.querySelector('.hero-name-en-inner');
+  const wrap = document.querySelector('.scramble-name');
+  if (!zh || !en || !wrap) return;
+  const zhText = wrap.dataset.scrambleZh || '';
+  const enText = wrap.dataset.scrambleEn || '';
+
+  // Initial scramble on load
+  // Start EN slightly after ZH for a cascading feel.
+  scrambleText(zh, zhText, { pool: SCRAMBLE_CHARS_CN, duration: 1100 });
+  setTimeout(() => scrambleText(en, enText, { pool: SCRAMBLE_CHARS_EN, duration: 1100 }), 120);
+
+  // Click anywhere on the name to re-scramble
+  wrap.addEventListener('click', () => {
+    scrambleText(zh, zhText, { pool: SCRAMBLE_CHARS_CN, duration: 900 });
+    scrambleText(en, enText, { pool: SCRAMBLE_CHARS_EN, duration: 900 });
+  });
 })();
 
 /* ============================================================
