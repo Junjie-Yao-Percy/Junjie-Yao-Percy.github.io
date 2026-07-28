@@ -170,14 +170,16 @@
   .btn.ghost:hover { background: var(--glass-bd); }
 
   /* ============================================================
-     "Name scramble" interactive element
-     - On page load, 姚俊杰 / Yao Junjie cycle through random
-       characters and resolve with a left-to-right stagger.
-     - Each char is its own <span class="schar">; when a char
-       locks in, it briefly bounces up + glows.
-     - Click the name to re-trigger the animation.
-     - Hero h1 keeps the same gradient styling as before but
-       becomes a clickable affordance.
+     "Name scramble" interactive element (v4 — whole-name)
+     - v1: rAF every 16ms → strobed chaos
+     - v2: per-char spans + Y-bounce + 28px shadow → chars
+           looked smudged and staircased due to inline-block
+           baseline misalignment
+     - v3: per-char spans + opacity only → still staircased
+           because of the per-char inline-block + gradient
+     - v4: SINGLE textContent. Whole name scrambles as one.
+           On resolve: brief whole-name green glow flash.
+     - Click the name to re-trigger.
      ============================================================ */
   .scramble-name {
     cursor: pointer;
@@ -192,46 +194,20 @@
     transform: translateY(0);
   }
 
-  /* Per-char span: each is a separate inline-block so it can have
-     its own lock-in animation. Gradient is per-char so it works
-     even if the parent .hero-name-zh's background-clip doesn't
-     propagate to descendants in some browsers. */
-  .hero-name-zh .schar {
-    display: inline-block;
-    background: linear-gradient(135deg, #fff 0%, #93c5fd 50%, #6ee7b7 100%);
-    -webkit-background-clip: text;
-            background-clip: text;
-    -webkit-text-fill-color: transparent;
-            color: transparent;
-    opacity: 0.55;                              /* dim while showing random */
-    transition: opacity 0.25s ease-out;
-    will-change: opacity, text-shadow;
-  }
-  .hero-name-en-inner .schar {
-    display: inline-block;
-    opacity: 0.55;                              /* dim while showing random */
-    transition: opacity 0.25s ease-out;
-    will-change: opacity, text-shadow;
-  }
-
-  /* v3 lock-in: NO Y-bounce, NO big text-shadow halo.
-     The "wow" is the opacity dim→bright transition + a brief
-     subtle glow. Adjacent chars in different states no longer
-     create a smudged/chaotic look. */
-  @keyframes char-resolve {
+  /* Whole-name resolve flash (fires once when scramble completes) */
+  @keyframes scramble-resolve-flash {
     0%   { text-shadow: 0 0 0 transparent; }
-    35%  { text-shadow: 0 0 10px var(--lock-glow, rgba(110,231,183,0.9)); }
+    35%  { text-shadow: 0 0 14px rgba(110, 231, 183, 0.95), 0 0 32px rgba(110, 231, 183, 0.35); }
     100% { text-shadow: 0 0 0 transparent; }
   }
-  .schar.locked {
-    opacity: 1;
-    animation: char-resolve 0.45s ease-out;
+  .scramble-resolved {
+    animation: scramble-resolve-flash 0.7s ease-out;
   }
-  .hero-name-zh .schar.locked {
-    --lock-glow: rgba(110, 231, 183, 0.9);
-  }
-  .hero-name-en-inner .schar.locked {
-    --lock-glow: rgba(203, 213, 225, 0.7);
+  /* During the flash we want the text readable (e.g. not affected
+     by other transitions on the parent). */
+  .hero-name-zh.scramble-resolved,
+  .hero-name-en-inner.scramble-resolved {
+    animation-name: scramble-resolve-flash;
   }
 
   /* ============================================================
