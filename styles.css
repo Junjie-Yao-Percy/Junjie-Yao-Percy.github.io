@@ -203,33 +203,35 @@
             background-clip: text;
     -webkit-text-fill-color: transparent;
             color: transparent;
-    will-change: transform, text-shadow;
+    opacity: 0.55;                              /* dim while showing random */
+    transition: opacity 0.25s ease-out;
+    will-change: opacity, text-shadow;
   }
   .hero-name-en-inner .schar {
     display: inline-block;
-    will-change: transform, text-shadow;
+    opacity: 0.55;                              /* dim while showing random */
+    transition: opacity 0.25s ease-out;
+    will-change: opacity, text-shadow;
   }
 
-  /* Lock-in animation: char bounces up then settles, with a
-     brief glow that fades. Uses cubic-bezier overshoot for a
-     satisfying "pop". */
-  @keyframes char-lock-bounce {
-    0%   { transform: translateY(0);    text-shadow: 0 0 0 transparent; }
-    35%  { transform: translateY(-5px); }
-    70%  { transform: translateY(0);    text-shadow: 0 0 14px var(--lock-glow, rgba(110,231,183,0.85)), 0 0 28px var(--lock-glow-2, rgba(110,231,183,0.30)); }
-    100% { transform: translateY(0);    text-shadow: 0 0 0 transparent; }
+  /* v3 lock-in: NO Y-bounce, NO big text-shadow halo.
+     The "wow" is the opacity dim→bright transition + a brief
+     subtle glow. Adjacent chars in different states no longer
+     create a smudged/chaotic look. */
+  @keyframes char-resolve {
+    0%   { text-shadow: 0 0 0 transparent; }
+    35%  { text-shadow: 0 0 10px var(--lock-glow, rgba(110,231,183,0.9)); }
+    100% { text-shadow: 0 0 0 transparent; }
   }
   .schar.locked {
-    animation: char-lock-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    opacity: 1;
+    animation: char-resolve 0.45s ease-out;
   }
-  /* Glow color matches each parent's accent */
   .hero-name-zh .schar.locked {
-    --lock-glow:    rgba(110, 231, 183, 0.85);
-    --lock-glow-2:  rgba(110, 231, 183, 0.30);
+    --lock-glow: rgba(110, 231, 183, 0.9);
   }
   .hero-name-en-inner .schar.locked {
-    --lock-glow:    rgba(203, 213, 225, 0.70);
-    --lock-glow-2:  rgba(148, 163, 184, 0.25);
+    --lock-glow: rgba(203, 213, 225, 0.7);
   }
 
   /* ============================================================
