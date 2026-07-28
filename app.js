@@ -376,6 +376,11 @@ function renderFooterAndModal() {
     </div>`;
 }
 
+// Lock body scroll on first load so wheel/touch scrolling is
+// blocked until the user clicks the bottom hint or presses any key.
+// (Hero content is still visible — just can't scroll past it.)
+document.body.classList.add('intro-active');
+
 function renderSite() {
   document.title = SITE.meta.title;
   const root = document.getElementById('site-root');
@@ -537,11 +542,24 @@ if (new URLSearchParams(location.search).get('noshow') === '1') {
 
 /* ============================================================
    "Press any key" hint at the bottom of the hero
-   - click OR any key press anywhere on the page (with sensible
-     filter on modifier-only / F-keys / typing in inputs)
-   - smooth-scrolls to #about, dismisses hint with fade
-   - does NOT lock body scroll — user can keep scrolling normally
+   - On first load, body scroll is locked (set above).
+   - click on hint OR any key press dismisses the hint,
+     unlocks body scroll, smooth-scrolls to #about.
+   - Nav anchor links also unlock body scroll so the user
+     can navigate freely after clicking a nav item.
+   - User CAN still scroll with mouse wheel / touch AFTER
+     unlocking — but not before.
    ============================================================ */
+function unlockIntro() {
+  document.body.classList.remove('intro-active');
+}
+
+// Nav links unlock the intro so the user can navigate directly
+// from the nav if they want (instead of pressing a key first).
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', () => unlockIntro());
+});
+
 (function () {
   const hint = document.querySelector('.scroll-hint');
   if (!hint) return;
@@ -551,6 +569,7 @@ if (new URLSearchParams(location.search).get('noshow') === '1') {
     dismissed = true;
     hint.classList.add('dismissed');
     setTimeout(() => hint.remove(), 500);
+    unlockIntro();
     const target = document.getElementById('about');
     if (target) target.scrollIntoView({ behavior: 'smooth' });
     document.removeEventListener('keydown', onKey);
