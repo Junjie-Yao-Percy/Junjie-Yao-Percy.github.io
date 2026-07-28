@@ -535,19 +535,14 @@ if (new URLSearchParams(location.search).get('noshow') === '1') {
 })();
 
 /* ============================================================
-   Name scramble — v5 (excuse phrases as the "noise")
-   - During scramble, the whole name cycles through a pool of
-     short "abstract excuse" phrases (CN + EN). On resolve, snap
-     to the final name + brief whole-name green flash.
-   - Rationale: v4's random character pool looked like noise.
-     v5's phrase pool makes the scramble state itself a joke —
-     every excuse you can imagine not replying to a message.
-   - Phrase lengths intentionally vary so the h1 width wobbles
-     a bit (looks playful, not broken).
-   - No per-char spans (those caused baseline misalignment on
-     Chinese chars in v2/v3). Single textContent per name.
-   - Click the name to re-scramble.
-   - No body lock, no button — purely visual.
+   Hero reveal — v6 (3-phase self-introduction)
+   - Phase 1: cycle through excuse phrases (the "noise")
+   - Phase 2: typewriter "额...对了" / "oh... right" (the "oh right" moment)
+   - Phase 3: final reveal "我是姚俊杰" / "I'm Yao Junjie" + green flash
+   - Story: every excuse you can think of for not answering,
+     then a moment of realization, then a real self-intro.
+   - Each phase is independently awaitable; click re-triggers
+     the whole sequence.
    ============================================================ */
 const SCRAMBLE_PHRASES_CN = [
   '出门没带手机', '消息没回', '不想加班', '衣服没洗',
@@ -568,57 +563,87 @@ const SCRAMBLE_PHRASES_EN = [
   'just woke', 'in transit', 'heads down', 'low batt'
 ];
 
-function scrambleText(el, finalText, opts = {}) {
+async function revealHero(el, opts) {
   if (!el) return;
+
+  // Cancel any previous reveal for THIS element
   if (el._scrambleRAF) cancelAnimationFrame(el._scrambleRAF);
   if (el._scrambleTO) clearTimeout(el._scrambleTO);
+  if (el._revealJob) el._revealJob.cancelled = true;
+  const job = { cancelled: false };
+  el._revealJob = job;
 
-  const duration = opts.duration ?? 1500;
-  const phrasePool = opts.phrasePool;
-  const frameInterval = opts.frameInterval ?? 280;
-
-  if (!phrasePool || phrasePool.length === 0) {
-    el.textContent = finalText;
-    return;
+  // Phase 1: cycle through excuse phrases
+  if (opts.cyclePhrases && opts.cyclePhrases.length > 0) {
+    await cyclePhrases(el, opts.cyclePhrases, opts.cycleDuration, opts.cycleFrameInterval, job);
+    if (job.cancelled) return;
   }
 
-  const pickPhrase = () => phrasePool[Math.floor(Math.random() * phrasePool.length)];
+  // Phase 2: typewriter realization
+  if (opts.typeText) {
+    await typewrite(el, opts.typeText, opts.typeCharDelay, opts.typeHold, job);
+    if (job.cancelled) return;
+  }
 
-  // Initial phrase
-  el.textContent = pickPhrase();
+  // Phase 3: final reveal + green flash
+  el.textContent = opts.finalText;
+  el.classList.remove('scramble-resolved');
+  void el.offsetWidth;
+  el.classList.add('scramble-resolved');
+  el._scrambleTO = setTimeout(() => el.classList.remove('scramble-resolved'), 700);
+}
 
-  const start = performance.now();
-  let lastFrame = start;
-  let lastPhrase = el.textContent;
+function cyclePhrases(el, pool, duration, frameInterval, job) {
+  return new Promise(resolve => {
+    el.textContent = pool[Math.floor(Math.random() * pool.length)];
+    const start = performance.now();
+    let lastFrame = start;
+    let lastPhrase = el.textContent;
 
-  const tick = (now) => {
-    const elapsed = now - start;
-    const needFrame = (now - lastFrame) >= frameInterval;
+    function tick(now) {
+      if (job.cancelled) { resolve(); return; }
+      const elapsed = now - start;
+      if (elapsed >= duration) { resolve(); return; }
 
-    if (elapsed >= duration) {
-      // Final snap + flash
-      el.textContent = finalText;
-      el.classList.remove('scramble-resolved');
-      void el.offsetWidth;
-      el.classList.add('scramble-resolved');
-      el._scrambleTO = setTimeout(() => el.classList.remove('scramble-resolved'), 700);
-      el._scrambleRAF = null;
-      return;
-    }
-
-    if (needFrame) {
-      // Avoid showing the same phrase twice in a row.
-      let next;
-      do {
-        next = pickPhrase();
-      } while (next === lastPhrase && phrasePool.length > 1);
-      el.textContent = next;
-      lastPhrase = next;
-      lastFrame = now;
+      if (now - lastFrame >= frameInterval) {
+        // Avoid same phrase twice in a row
+        let next;
+        do {
+          next = pool[Math.floor(Math.random() * pool.length)];
+        } while (next === lastPhrase && pool.length > 1);
+        el.textContent = next;
+        lastPhrase = next;
+        lastFrame = now;
+      }
+      el._scrambleRAF = requestAnimationFrame(tick);
     }
     el._scrambleRAF = requestAnimationFrame(tick);
-  };
-  el._scrambleRAF = requestAnimationFrame(tick);
+  });
+}
+
+function typewrite(el, text, charDelay, hold, job) {
+  return new Promise(resolve => {
+    el.classList.add('typing');
+    el.textContent = '';
+    let i = 0;
+
+    function next() {
+      if (job.cancelled) {
+        el.classList.remove('typing');
+        resolve();
+        return;
+      }
+      if (i >= text.length) {
+        el.classList.remove('typing');
+        el._scrambleTO = setTimeout(resolve, hold);
+        return;
+      }
+      el.textContent += text[i];
+      i++;
+      el._scrambleTO = setTimeout(next, charDelay);
+    }
+    next();
+  });
 }
 
 (function () {
@@ -626,18 +651,53 @@ function scrambleText(el, finalText, opts = {}) {
   const en = document.querySelector('.hero-name-en-inner');
   const wrap = document.querySelector('.scramble-name');
   if (!zh || !en || !wrap) return;
-  const zhText = wrap.dataset.scrambleZh || '';
-  const enText = wrap.dataset.scrambleEn || '';
 
-  // Initial scramble — whole-name phrase cycle.
-  scrambleText(zh, zhText, { phrasePool: SCRAMBLE_PHRASES_CN, duration: 1500, frameInterval: 300 });
-  // EN follows 250ms later.
-  setTimeout(() => scrambleText(en, enText, { phrasePool: SCRAMBLE_PHRASES_EN, duration: 1200, frameInterval: 220 }), 250);
+  // Initial reveal — CN
+  revealHero(zh, {
+    cyclePhrases:    SCRAMBLE_PHRASES_CN,
+    cycleDuration:   1500,
+    cycleFrameInterval: 250,
+    typeText:        '额...对了',
+    typeCharDelay:   80,
+    typeHold:        300,
+    finalText:       '我是姚俊杰'
+  });
 
-  // Click anywhere on the name to re-scramble.
+  // EN starts 250ms after CN (slight cascade)
+  setTimeout(() => {
+    revealHero(en, {
+      cyclePhrases:    SCRAMBLE_PHRASES_EN,
+      cycleDuration:   1200,
+      cycleFrameInterval: 220,
+      typeText:        'oh... right',
+      typeCharDelay:   60,
+      typeHold:        250,
+      finalText:       "I'm Yao Junjie"
+    });
+  }, 250);
+
+  // Click to re-introduce (shorter, snappier)
   wrap.addEventListener('click', () => {
-    scrambleText(zh, zhText, { phrasePool: SCRAMBLE_PHRASES_CN, duration: 1100, frameInterval: 200 });
-    setTimeout(() => scrambleText(en, enText, { phrasePool: SCRAMBLE_PHRASES_EN, duration: 900, frameInterval: 160 }), 120);
+    revealHero(zh, {
+      cyclePhrases:    SCRAMBLE_PHRASES_CN,
+      cycleDuration:   900,
+      cycleFrameInterval: 180,
+      typeText:        '额...对了',
+      typeCharDelay:   50,
+      typeHold:        200,
+      finalText:       '我是姚俊杰'
+    });
+    setTimeout(() => {
+      revealHero(en, {
+        cyclePhrases:    SCRAMBLE_PHRASES_EN,
+        cycleDuration:   800,
+        cycleFrameInterval: 160,
+        typeText:        'oh... right',
+        typeCharDelay:   40,
+        typeHold:        180,
+        finalText:       "I'm Yao Junjie"
+      });
+    }, 180);
   });
 })();
 
