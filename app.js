@@ -128,6 +128,10 @@ function renderHero() {
           <a class="btn ghost" href="#about">👋 More About Me</a>
         </div>
       </div>
+      <button class="scroll-hint" type="button" aria-label="Click or press any key to scroll down">
+        <span class="sh-label">Press any key · or click to scroll</span>
+        <span class="sh-cursor" aria-hidden="true">▌</span>
+      </button>
     </header>`;
 }
 
@@ -372,27 +376,10 @@ function renderFooterAndModal() {
     </div>`;
 }
 
-function renderIntroOverlay() {
-  return `
-    <div class="intro-overlay" id="intro-overlay" role="button" tabindex="0" aria-label="Press any key or click to enter">
-      <div class="intro-stack">
-        <div class="intro-eyebrow">// yj · personal</div>
-        <div class="intro-title">Press any key</div>
-        <div class="intro-sub">or click to enter<span class="intro-cursor" aria-hidden="true">▌</span></div>
-      </div>
-    </div>
-  `;
-}
-
-// Lock body scroll as early as possible so the page is locked
-// from first paint, not just after renderSite() finishes.
-document.body.classList.add('intro-active');
-
 function renderSite() {
   document.title = SITE.meta.title;
   const root = document.getElementById('site-root');
   root.innerHTML = [
-    renderIntroOverlay(),
     renderNavigation(),
     renderHero(),
     renderAbout(),
@@ -549,41 +536,26 @@ if (new URLSearchParams(location.search).get('noshow') === '1') {
 })();
 
 /* ============================================================
-   Intro overlay — "Press any key to enter" gate
-   - Full-screen overlay blocks all page content until dismissed
-   - Body scroll is locked while overlay is up
-   - click OR any key press (with sensible filter) dismisses it,
-     unlocks scroll, smooth-scrolls to #about, removes the overlay
-   - Once dismissed, the user is "in" the site — the start screen
-     is gone for good (no scroll back to it)
+   "Press any key" hint at the bottom of the hero
+   - click OR any key press anywhere on the page (with sensible
+     filter on modifier-only / F-keys / typing in inputs)
+   - smooth-scrolls to #about, dismisses hint with fade
+   - does NOT lock body scroll — user can keep scrolling normally
    ============================================================ */
 (function () {
-  const overlay = document.getElementById('intro-overlay');
-  if (!overlay) return;
+  const hint = document.querySelector('.scroll-hint');
+  if (!hint) return;
   let dismissed = false;
-
-  // Lock scroll until interaction
-  document.body.classList.add('intro-active');
-
   const dismiss = () => {
     if (dismissed) return;
     dismissed = true;
-    overlay.classList.add('dismissed');
-    document.body.classList.remove('intro-active');
-    setTimeout(() => overlay.remove(), 700);
+    hint.classList.add('dismissed');
+    setTimeout(() => hint.remove(), 500);
     const target = document.getElementById('about');
     if (target) target.scrollIntoView({ behavior: 'smooth' });
     document.removeEventListener('keydown', onKey);
   };
-
-  overlay.addEventListener('click', dismiss);
-  overlay.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      dismiss();
-    }
-  });
-
+  hint.addEventListener('click', e => { e.preventDefault(); dismiss(); });
   const isPrintable = (k) => k.length === 1 || ['Enter', 'Space', 'ArrowDown', 'ArrowUp', 'Tab', 'Escape'].includes(k);
   const onKey = (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
