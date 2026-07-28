@@ -169,6 +169,12 @@
   /* ============================================================
      "Press any key" hint at the bottom of the hero
      ============================================================ */
+  /* Lock body scroll until the user interacts with the hint
+     (or any key) for the first time. */
+  body.intro-active {
+    overflow: hidden;
+    height: 100vh;
+  }
   .scroll-hint {
     position: absolute;
     bottom: 32px;
