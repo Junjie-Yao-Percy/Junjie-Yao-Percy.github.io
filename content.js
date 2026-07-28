@@ -26,8 +26,8 @@ window.SITE_CONTENT = {
 
   hero: {
     greeting: "// hi, I'm",
-    nameZh: '姚俊杰',
-    nameEn: 'Yao Junjie',
+    nameZh: '我是姚俊杰',
+    nameEn: "I'm Yao Junjie",
     degree: 'M.S. in Computer Science',
     school: '@ UESTC',
     summary: 'Researching neural architecture search, edge AI, and embodied AI.',
