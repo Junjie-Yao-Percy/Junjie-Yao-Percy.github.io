@@ -535,47 +535,61 @@ if (new URLSearchParams(location.search).get('noshow') === '1') {
 })();
 
 /* ============================================================
-   Name scramble — v4 (whole-name, no per-char spans)
-   - Single textContent per name. No per-char spans.
-   - v2/v3 used <span class="schar"> per char for cascade, but
-     inline-block + per-char gradient text-fill caused visible
-     baseline misalignment on Chinese chars (the chars looked
-     "staircased" even after the animation finished).
-   - v4 cycle the WHOLE string as one, then on resolve snap to
-     the final text + fire a brief whole-name glow flash.
-   - Slower per-frame rate (110ms) so each random char is
-     clearly readable.
-   - On click: re-trigger.
+   Name scramble — v5 (excuse phrases as the "noise")
+   - During scramble, the whole name cycles through a pool of
+     short "abstract excuse" phrases (CN + EN). On resolve, snap
+     to the final name + brief whole-name green flash.
+   - Rationale: v4's random character pool looked like noise.
+     v5's phrase pool makes the scramble state itself a joke —
+     every excuse you can imagine not replying to a message.
+   - Phrase lengths intentionally vary so the h1 width wobbles
+     a bit (looks playful, not broken).
+   - No per-char spans (those caused baseline misalignment on
+     Chinese chars in v2/v3). Single textContent per name.
+   - Click the name to re-scramble.
    - No body lock, no button — purely visual.
    ============================================================ */
-const SCRAMBLE_CHARS_CN =
-  '的一是了我不在人们有这个就那好都一上也能到他要会着没自己对于和着要中下以为所以哦啊呢嗯哈呀哇呃哎哟嗨喂呀呜哦噢哈嘻';
-const SCRAMBLE_CHARS_EN =
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const SCRAMBLE_PHRASES_CN = [
+  '出门没带手机', '消息没回', '不想加班', '衣服没洗',
+  '我在路上', '刚看到', '网络不好', '手机没电',
+  '在洗澡', '刚醒', '马上到', '忘了',
+  '等一下', '再说吧', '有点忙', '回头聊',
+  '可能吧', '算了吧', '没事没事', '下次吧',
+  '别催了', '马上好', '再等等', '在地铁',
+  '我看看', '不一定', '回头说', '有点事'
+];
+
+const SCRAMBLE_PHRASES_EN = [
+  'on the way', 'phone dead', 'shower now', 'lunch time',
+  'at the gym', 'wifi sucks', 'no signal', 'busy now',
+  'in a mtg', 'rushing', 'l8r ok', 'gonna pass',
+  'maybe next', 'no thanks', 'driving', 'walking',
+  'brb', 'omw', 'ttyl', 'afk',
+  'just woke', 'in transit', 'heads down', 'low batt'
+];
 
 function scrambleText(el, finalText, opts = {}) {
   if (!el) return;
   if (el._scrambleRAF) cancelAnimationFrame(el._scrambleRAF);
   if (el._scrambleTO) clearTimeout(el._scrambleTO);
 
-  const duration = opts.duration ?? 1400;
-  const pool = opts.pool || SCRAMBLE_CHARS_EN;
-  const frameInterval = opts.frameInterval ?? 110;
-  const preserveSpace = opts.preserveSpace !== false;
+  const duration = opts.duration ?? 1500;
+  const phrasePool = opts.phrasePool;
+  const frameInterval = opts.frameInterval ?? 280;
 
-  // Logical chars (handles Chinese as 1 unit, not 3 bytes).
-  const target = Array.from(finalText);
-  const isSpace = (c) => c === ' ' || c === '\u00A0';
-  const pickRandom = () => pool[Math.floor(Math.random() * pool.length)];
+  if (!phrasePool || phrasePool.length === 0) {
+    el.textContent = finalText;
+    return;
+  }
 
-  // Initial random string (preserve spaces).
-  const randomString = () => target
-    .map(c => (preserveSpace && isSpace(c)) ? '\u00A0' : pickRandom())
-    .join('');
-  el.textContent = randomString();
+  const pickPhrase = () => phrasePool[Math.floor(Math.random() * phrasePool.length)];
+
+  // Initial phrase
+  el.textContent = pickPhrase();
 
   const start = performance.now();
   let lastFrame = start;
+  let lastPhrase = el.textContent;
 
   const tick = (now) => {
     const elapsed = now - start;
@@ -584,8 +598,6 @@ function scrambleText(el, finalText, opts = {}) {
     if (elapsed >= duration) {
       // Final snap + flash
       el.textContent = finalText;
-      // Reset + force reflow + add class so the resolve-flash actually plays
-      // (also handles re-trigger when class is already present).
       el.classList.remove('scramble-resolved');
       void el.offsetWidth;
       el.classList.add('scramble-resolved');
@@ -595,7 +607,13 @@ function scrambleText(el, finalText, opts = {}) {
     }
 
     if (needFrame) {
-      el.textContent = randomString();
+      // Avoid showing the same phrase twice in a row.
+      let next;
+      do {
+        next = pickPhrase();
+      } while (next === lastPhrase && phrasePool.length > 1);
+      el.textContent = next;
+      lastPhrase = next;
       lastFrame = now;
     }
     el._scrambleRAF = requestAnimationFrame(tick);
@@ -611,15 +629,15 @@ function scrambleText(el, finalText, opts = {}) {
   const zhText = wrap.dataset.scrambleZh || '';
   const enText = wrap.dataset.scrambleEn || '';
 
-  // Initial scramble — whole-name, 110ms/frame.
-  scrambleText(zh, zhText, { pool: SCRAMBLE_CHARS_CN, duration: 1400, frameInterval: 110 });
-  // EN follows 250ms later (slight cascade feel without per-char spans).
-  setTimeout(() => scrambleText(en, enText, { pool: SCRAMBLE_CHARS_EN, duration: 1200, frameInterval: 95 }), 250);
+  // Initial scramble — whole-name phrase cycle.
+  scrambleText(zh, zhText, { phrasePool: SCRAMBLE_PHRASES_CN, duration: 1500, frameInterval: 300 });
+  // EN follows 250ms later.
+  setTimeout(() => scrambleText(en, enText, { phrasePool: SCRAMBLE_PHRASES_EN, duration: 1200, frameInterval: 220 }), 250);
 
   // Click anywhere on the name to re-scramble.
   wrap.addEventListener('click', () => {
-    scrambleText(zh, zhText, { pool: SCRAMBLE_CHARS_CN, duration: 1000, frameInterval: 70 });
-    setTimeout(() => scrambleText(en, enText, { pool: SCRAMBLE_CHARS_EN, duration: 900, frameInterval: 60 }), 120);
+    scrambleText(zh, zhText, { phrasePool: SCRAMBLE_PHRASES_CN, duration: 1100, frameInterval: 200 });
+    setTimeout(() => scrambleText(en, enText, { phrasePool: SCRAMBLE_PHRASES_EN, duration: 900, frameInterval: 160 }), 120);
   });
 })();
 
