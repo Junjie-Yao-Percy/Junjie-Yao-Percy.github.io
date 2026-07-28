@@ -6,3 +6,8 @@ screenshot_*.png
 _screenshot.html
 _shot.html
 resume.html
+
+# local QA and rollback artifacts
+.codex-baseline/
+qa-*
+tools/qa_site.cjs
