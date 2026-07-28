@@ -178,7 +178,28 @@
   .scroll-hint {
     position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
     color: var(--fg-2); font-size: 12px;
-    opacity: 0; animation: fadeUp .7s 1s forwards, bounce 2.4s 1.7s infinite;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    opacity: 0;
+    transition: color .25s, border-color .25s, background .25s;
+    animation: fadeUp .7s 1s forwards, bounce 2.4s 1.7s infinite;
+  }
+  .scroll-hint:hover {
+    color: var(--accent-2);
+    border-color: rgba(16,185,129,0.35);
+    background: rgba(16,185,129,0.06);
+  }
+  .scroll-hint:focus-visible {
+    outline: none;
+    color: var(--accent-2);
+    border-color: rgba(16,185,129,0.55);
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.18);
+  }
+  .scroll-hint:active {
+    transform: translateX(-50%) translateY(2px);
   }
 
   @keyframes fadeUp {
@@ -1432,7 +1453,7 @@
       <a class="btn ghost" href="#about">👋 More About Me</a>
     </div>
   </div>
-  <div class="scroll-hint">↓ scroll ↓</div>
+  <a class="scroll-hint" href="#about" aria-label="Scroll down to About section">↓ scroll ↓</a>
 </header>
 
 <!-- ============== ABOUT ============== -->
