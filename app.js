@@ -535,15 +535,18 @@ if (new URLSearchParams(location.search).get('noshow') === '1') {
 })();
 
 /* ============================================================
-   Name scramble — "terminal / cyberpunk" reveal
+   Name scramble — v3 (clean reveal)
    - Each char is its own <span class="schar">.
-   - On load: 姚俊杰 and "Yao Junjie" cycle through random
-     chars and resolve to the final text with a per-character
-     stagger (wave from left to right).
-   - When a char locks in, it briefly bounces up + glows.
-   - Frame interval is ~80ms (not rAF) so each random char is
-     actually visible instead of strobing.
-   - On click: re-trigger the same animation, snappier.
+   - On load: 姚俊杰 and "Yao Junjie" cycle through random chars
+     and resolve to the final text with a per-char cascade.
+   - Random chars are dim (opacity 0.55) so they read as "noise";
+     the locked char fades to full opacity with a brief subtle
+     glow pulse.
+   - NO Y-bounce, NO big text-shadow halo — v2's translateY
+     bounce + 28px shadow made Chinese chars look smudged and
+     chaotic when adjacent chars were in different bounce states.
+   - Frame interval 100ms so each random char is clearly readable.
+   - On click: re-trigger the same animation.
    - No body lock, no button — purely visual.
    ============================================================ */
 const SCRAMBLE_CHARS_CN =
@@ -555,9 +558,9 @@ function scrambleText(el, finalText, opts = {}) {
   if (!el) return;
   if (el._scrambleRAF) cancelAnimationFrame(el._scrambleRAF);
 
-  const duration = opts.duration ?? 1500;
+  const duration = opts.duration ?? 1200;
   const pool = opts.pool || SCRAMBLE_CHARS_EN;
-  const frameInterval = opts.frameInterval ?? 80;
+  const frameInterval = opts.frameInterval ?? 100;
   const preserveSpace = opts.preserveSpace !== false;
 
   // Treat each "logical" char (handles Chinese 1 char = 1 unit, not 3 bytes).
@@ -566,8 +569,6 @@ function scrambleText(el, finalText, opts = {}) {
   const pickRandom = () => pool[Math.floor(Math.random() * pool.length)];
 
   // Build (or reuse) per-char <span> children.
-  // Reuse if count matches AND they're already .schar (so click-re-triggers
-  // don't churn the DOM).
   let spans;
   if (el.children.length === target.length &&
       el.children[0] && el.children[0].classList &&
@@ -577,7 +578,6 @@ function scrambleText(el, finalText, opts = {}) {
       s.classList.remove('locked');
       // Clear any in-flight lock animation so it can replay.
       s.style.animation = 'none';
-      // Force reflow before re-adding the class.
       void s.offsetWidth;
       s.style.animation = '';
     });
@@ -592,10 +592,10 @@ function scrambleText(el, finalText, opts = {}) {
   }
 
   // Per-char resolve time, staggered from left to right.
-  // Window: 30% → 90% of duration. ±2.5% jitter so it doesn't feel mechanical.
+  // Window: 40% → 92% of duration. ±2% jitter so it doesn't feel mechanical.
   const resolveAt = target.map((_, i) => {
-    const t = 0.30 + (i / Math.max(1, target.length - 1)) * 0.60;
-    return duration * Math.min(1, Math.max(0, t + (Math.random() - 0.5) * 0.05));
+    const t = 0.40 + (i / Math.max(1, target.length - 1)) * 0.52;
+    return duration * Math.min(1, Math.max(0, t + (Math.random() - 0.5) * 0.04));
   });
 
   // Initial display: random for non-space, space for space.
@@ -622,8 +622,7 @@ function scrambleText(el, finalText, opts = {}) {
       if (elapsed >= resolveAt[i]) {
         if (!spans[i].classList.contains('locked')) {
           spans[i].textContent = target[i];
-          // Force reflow before re-adding the .locked class so the
-          // bounce/glow animation actually plays (not skipped).
+          // Force reflow so the lock animation actually plays.
           spans[i].style.animation = 'none';
           void spans[i].offsetWidth;
           spans[i].style.animation = '';
@@ -640,7 +639,6 @@ function scrambleText(el, finalText, opts = {}) {
     if (needFrame) lastFrame = now;
 
     if (allDone) {
-      // Final pass: make sure every char is correct (defensive).
       spans.forEach((s, i) => {
         if (!(preserveSpace && isSpace(target[i]))) {
           if (s.textContent !== target[i]) s.textContent = target[i];
@@ -663,17 +661,15 @@ function scrambleText(el, finalText, opts = {}) {
   const zhText = wrap.dataset.scrambleZh || '';
   const enText = wrap.dataset.scrambleEn || '';
 
-  // Initial scramble — slow + deliberate, with per-char lock-in bounce.
-  // Frame interval 80ms means each random char is visible for ~80ms
-  // (vs 16ms with rAF, which just strobes).
-  scrambleText(zh, zhText, { pool: SCRAMBLE_CHARS_CN, duration: 1500, frameInterval: 85 });
-  // EN follows 220ms later, slightly snappier (more chars → less per-char thinking time).
-  setTimeout(() => scrambleText(en, enText, { pool: SCRAMBLE_CHARS_EN, duration: 1300, frameInterval: 65 }), 220);
+  // Initial scramble — slow (100ms/frame), opacity-only reveal.
+  scrambleText(zh, zhText, { pool: SCRAMBLE_CHARS_CN, duration: 1200, frameInterval: 110 });
+  // EN follows 200ms later, slightly tighter (more chars).
+  setTimeout(() => scrambleText(en, enText, { pool: SCRAMBLE_CHARS_EN, duration: 1100, frameInterval: 85 }), 200);
 
-  // Click anywhere on the name to re-scramble — quicker (already-seen text).
+  // Click anywhere on the name to re-scramble.
   wrap.addEventListener('click', () => {
-    scrambleText(zh, zhText, { pool: SCRAMBLE_CHARS_CN, duration: 900, frameInterval: 55 });
-    scrambleText(en, enText, { pool: SCRAMBLE_CHARS_EN, duration: 900, frameInterval: 50 });
+    scrambleText(zh, zhText, { pool: SCRAMBLE_CHARS_CN, duration: 800, frameInterval: 70 });
+    scrambleText(en, enText, { pool: SCRAMBLE_CHARS_EN, duration: 800, frameInterval: 60 });
   });
 })();
 
