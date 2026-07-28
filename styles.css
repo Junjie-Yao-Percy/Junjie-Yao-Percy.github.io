@@ -117,11 +117,14 @@
     font-weight: 800;
     line-height: 1.05;
     letter-spacing: -1.5px;
-    background: linear-gradient(135deg, #fff 0%, #93c5fd 50%, #6ee7b7 100%);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent;
     margin-bottom: 14px;
     opacity: 0; animation: fadeUp .7s .25s forwards;
+  }
+  .hero-name-zh {
+    background: linear-gradient(135deg, #fff 0%, #93c5fd 50%, #6ee7b7 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
   .hero h2 {
     font-size: clamp(18px, 2.6vw, 26px);
@@ -167,78 +170,24 @@
   .btn.ghost:hover { background: var(--glass-bd); }
 
   /* ============================================================
-     "Press any key" hint at the bottom of the hero
+     "Name scramble" interactive element
+     - On page load, 姚俊杰 / Yao Junjie cycle through random
+       characters and resolve with a left-to-right stagger.
+     - Click the name to re-trigger the animation.
+     - Hero h1 keeps the same gradient styling as before but
+       becomes a clickable affordance.
      ============================================================ */
-  /* Lock body scroll until the user interacts with the hint
-     (or any key) for the first time. */
-  body.intro-active {
-    overflow: hidden;
-    height: 100vh;
-  }
-  .scroll-hint {
-    position: absolute;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 2.4px;
-    text-transform: uppercase;
-    color: var(--fg-1);
-    padding: 10px 18px 10px 20px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.10);
-    background: rgba(15, 30, 58, 0.55);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+  .scramble-name {
     cursor: pointer;
-    opacity: 0;
-    transition: color .25s, border-color .25s, background .25s, opacity .4s, transform .4s;
-    animation: fadeUp .7s 1s forwards, hint-bounce 2.4s 1.7s infinite;
+    user-select: none;
+    transition: filter .25s, transform .25s;
   }
-  button.scroll-hint { font-family: var(--mono); }
-  .sh-cursor {
-    display: inline-block;
-    color: var(--accent-2);
-    margin-left: 2px;
-    animation: cursor-blink 1s steps(2) infinite;
+  .scramble-name:hover {
+    filter: brightness(1.08) saturate(1.05);
+    transform: translateY(-1px);
   }
-  .scroll-hint:hover {
-    color: var(--accent-2);
-    border-color: rgba(16,185,129,0.45);
-    background: rgba(16,185,129,0.10);
-  }
-  .scroll-hint:hover .sh-cursor { animation-play-state: paused; opacity: 1; }
-  .scroll-hint:focus-visible {
-    outline: none;
-    color: var(--accent-2);
-    border-color: rgba(16,185,129,0.55);
-    box-shadow: 0 0 0 3px rgba(16,185,129,0.18);
-  }
-  .scroll-hint:active {
-    transform: translateX(-50%) translateY(2px);
-  }
-  .scroll-hint.dismissed {
-    opacity: 0 !important;
-    transform: translateX(-50%) translateY(24px) !important;
-    pointer-events: none;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes hint-bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50%      { transform: translateX(-50%) translateY(-6px); }
-  }
-  @keyframes cursor-blink {
-    0%, 49%   { opacity: 1; }
-    50%, 100% { opacity: 0; }
+  .scramble-name:active {
+    transform: translateY(0);
   }
 
   /* ============================================================
