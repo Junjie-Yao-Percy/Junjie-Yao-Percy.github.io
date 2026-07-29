@@ -106,9 +106,14 @@ function renderContributionGraph(config) {
 function renderNavigation() {
   return `
     <nav class="top">
+      <div class="nav-progress" aria-hidden="true"></div>
       <div class="container row">
-        <div class="brand">${escapeHtml(SITE.meta.brand)}</div>
+        <a class="brand" href="#" aria-label="Back to top">
+          <span class="brand-mark">YJ</span>
+          <span class="brand-path">${escapeHtml(SITE.meta.brand)}</span>
+        </a>
         <ul>${SITE.navigation.map(item => `<li><a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a></li>`).join('')}</ul>
+        <div class="nav-status" aria-hidden="true"><span></span> LIVE PORTFOLIO</div>
       </div>
     </nav>`;
 }
@@ -117,21 +122,60 @@ function renderHero() {
   const hero = SITE.hero;
   return `
     <header class="hero">
-      <div>
-        <div class="greeting">${escapeHtml(hero.greeting)}</div>
-        <h1 class="scramble-name" data-scramble-zh="${escapeHtml(hero.nameZh)}" data-scramble-en="${escapeHtml(hero.nameEn)}" title="Click to scramble">
-          <span class="hero-name-zh"></span>
-          <span class="hero-name-en">/ <span class="hero-name-en-inner"></span></span>
-        </h1>
-        <h2>${escapeHtml(hero.degree)} <span class="tag">${escapeHtml(hero.school)}</span></h2>
-        <p class="sub">${escapeHtml(hero.summary)}</p>
-        <div class="cta">
-          <a class="btn primary" href="#publications">📄 View Publications</a>
-          <a class="btn ghost" href="${escapeHtml(hero.scholarUrl)}" target="_blank" rel="noopener">🎓 Google Scholar</a>
-          <a class="btn ghost" href="#about">👋 More About Me</a>
+      <div class="hero-orbit hero-orbit-a" aria-hidden="true"></div>
+      <div class="hero-orbit hero-orbit-b" aria-hidden="true"></div>
+      <div class="hero-shell">
+        <div class="hero-main">
+          <div class="hero-kicker-row">
+            <span class="hero-kicker">RESEARCH AVATAR</span>
+            <span class="hero-kicker alt">LV. M.S.-01</span>
+          </div>
+          <div class="greeting">${escapeHtml(hero.greeting)}</div>
+          <h1 class="scramble-name" data-scramble-zh="${escapeHtml(hero.nameZh)}" data-scramble-en="${escapeHtml(hero.nameEn)}" title="Click to scramble">
+            <span class="hero-name-zh"></span>
+            <span class="hero-name-en">/ <span class="hero-name-en-inner"></span></span>
+          </h1>
+          <h2>${escapeHtml(hero.degree)} <span class="tag">${escapeHtml(hero.school)}</span></h2>
+          <p class="sub">${escapeHtml(hero.summary)}</p>
+          <div class="cta">
+            <a class="btn primary" href="#publications">📄 View Publications</a>
+            <a class="btn ghost" href="${escapeHtml(hero.scholarUrl)}" target="_blank" rel="noopener">🎓 Google Scholar</a>
+            <a class="btn ghost" href="#about">👋 More About Me</a>
+          </div>
         </div>
+        <aside class="hero-console glass reveal show" aria-label="Research system summary">
+          <div class="console-top">
+            <span class="console-dot red"></span>
+            <span class="console-dot yellow"></span>
+            <span class="console-dot green"></span>
+            <span class="console-title">mission.config</span>
+          </div>
+          <div class="console-lines">
+            <div><span>mode</span><b>edge-ai / embodied-ai</b></div>
+            <div><span>stack</span><b>NAS · CV · robotics</b></div>
+            <div><span>target</span><b>real-time deployment</b></div>
+            <div><span>status</span><b>open to collaborate</b></div>
+          </div>
+          <div class="console-meter" aria-hidden="true"><span></span></div>
+          <div class="console-note">click the name · trigger intro animation</div>
+        </aside>
+      </div>
+      <div class="hero-stickers" aria-hidden="true">
+        <span>NAS</span>
+        <span>CV</span>
+        <span>EDGE</span>
+        <span>ROBOT</span>
       </div>
     </header>`;
+}
+
+function renderSectionRibbon() {
+  return `
+    <div class="side-ribbon" aria-hidden="true">
+      <span>姚俊杰</span>
+      <span>YAO JUNJIE</span>
+      <span>PORTFOLIO</span>
+    </div>`;
 }
 
 function renderAbout() {
@@ -186,6 +230,10 @@ function renderAbout() {
                   <div class="avatar-glow"></div>
                   <div class="avatar-border"></div>
                   <img class="avatar-img" src="assets/avatar/cartoon.png" alt="${escapeHtml(about.nameEn)}" />
+                  <div class="avatar-ui">
+                    <span>PLAYER</span>
+                    <b>YJ // AI RESEARCH</b>
+                  </div>
                 </div>
               </div>
               <div class="bento-focus glass reveal">
@@ -233,8 +281,9 @@ function renderExperience() {
 function renderPublications() {
   const scholarUrl = SITE.hero.scholarUrl;
   const moreLink = `<a class="more-link" href="${escapeHtml(scholarUrl)}" target="_blank" rel="noopener">完整列表 → Scholar</a>`;
-  const published = SITE.publications.map(publication => `
+  const published = SITE.publications.map((publication, index) => `
     <article class="pub-card glass reveal" data-pub="${escapeHtml(publication.id)}">
+      <span class="pub-index" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
       <a class="pub-cover" href="${escapeHtml(publication.pdfUrl)}" target="_blank" rel="noopener" aria-label="Open PDF">
         <img class="pub-cover-img" src="${escapeHtml(publication.coverUrl)}" alt="${escapeHtml(publication.coverAlt)}" loading="lazy" />
         <span class="pub-cover-badge ${escapeHtml(publication.coverBadge.className)}">${escapeHtml(publication.coverBadge.label)}</span>
@@ -380,6 +429,7 @@ function renderSite() {
   const root = document.getElementById('site-root');
   root.innerHTML = [
     renderNavigation(),
+    renderSectionRibbon(),
     renderHero(),
     renderAbout(),
     renderExperience(),
@@ -392,6 +442,53 @@ function renderSite() {
 }
 
 renderSite();
+
+/* ============================================================
+   Interface polish: scroll progress, pointer aura, click sparks
+   ============================================================ */
+(function initInterfaceFx() {
+  const root = document.documentElement;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const progress = document.querySelector('.nav-progress');
+  const navLinks = [...document.querySelectorAll('nav.top a[href^="#"]')]
+    .filter(link => link.getAttribute('href') !== '#');
+  const sections = navLinks
+    .map(link => document.querySelector(link.getAttribute('href')))
+    .filter(Boolean);
+
+  function updateScrollState() {
+    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const pct = Math.min(1, Math.max(0, window.scrollY / max));
+    if (progress) progress.style.transform = `scaleX(${pct})`;
+
+    let activeId = '';
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= 120) activeId = section.id;
+    }
+    navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${activeId}`));
+  }
+
+  window.addEventListener('scroll', updateScrollState, { passive: true });
+  window.addEventListener('resize', updateScrollState);
+  updateScrollState();
+
+  if (!prefersReducedMotion) {
+    window.addEventListener('pointermove', event => {
+      root.style.setProperty('--mx', `${event.clientX}px`);
+      root.style.setProperty('--my', `${event.clientY}px`);
+    }, { passive: true });
+
+    document.addEventListener('click', event => {
+      const burst = document.createElement('span');
+      burst.className = 'click-burst';
+      burst.style.left = `${event.clientX}px`;
+      burst.style.top = `${event.clientY}px`;
+      burst.textContent = '✦';
+      document.body.appendChild(burst);
+      setTimeout(() => burst.remove(), 700);
+    });
+  }
+})();
 
 /* ============================================================
    Particles background
