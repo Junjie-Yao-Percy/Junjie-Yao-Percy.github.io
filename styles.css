@@ -1287,6 +1287,49 @@
     gap: 3px;
     font-size: 11px;
   }
+  /* Live-sync stamp + manual refresh button (auto-updates from GitHub) */
+  .gh-stamp {
+    flex: 1;
+    text-align: right;
+    font-size: 10.5px;
+    color: var(--fg-2);
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .gh-stamp.live { color: var(--accent-2); }
+  .gh-refresh {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    border: 1px solid var(--glass-bd);
+    background: rgba(255,255,255,0.04);
+    color: var(--fg-1);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    transition: border-color .2s, color .2s, background .2s;
+  }
+  .gh-refresh:hover {
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+    background: rgba(16,185,129,0.06);
+  }
+  .gh-refresh.spinning {
+    animation: gh-refresh-spin 0.7s linear infinite;
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+  }
+  @keyframes gh-refresh-spin {
+    to { transform: rotate(360deg); }
+  }
   .gh-legend-cell {
     display: inline-block;
     width: 11px;
