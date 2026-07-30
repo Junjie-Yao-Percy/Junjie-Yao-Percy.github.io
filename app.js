@@ -40,41 +40,58 @@ function utcDate(value) {
   return new Date(`${value}T00:00:00Z`);
 }
 
+// Use local dates for the contribution graph (matches GitHub's own behavior).
+// This way "today" in the graph matches the viewer's local "today", not UTC.
+function localDate(value) {
+  return new Date(`${value}T00:00:00`);
+}
+function localIsoDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
 function isoDate(date) {
-  return date.toISOString().slice(0, 10);
+  return localIsoDate(date);
 }
 
 function contributionTitle(date, count) {
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const dateLabel = `${weekdays[date.getUTCDay()]} ${months[date.getUTCMonth()]} ${date.getUTCDate()} ${date.getUTCFullYear()}`;
+  const dateLabel = `${weekdays[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()}`;
   if (count === 0) return `No contributions on ${dateLabel}`;
   return `${count} contribution${count === 1 ? '' : 's'} on ${dateLabel}`;
 }
 
 function renderContributionGraph(config) {
-  const start = utcDate(config.startDate);
-  const end = utcDate(config.endDate);
+  const start = localDate(config.startDate);
+  const configEnd = localDate(config.endDate);
+  // Extend the graph up to today (local) so freshly fetched events have
+  // a cell to land in. (Without this, the endDate from content.js is
+  // fixed at deploy time and new commits have nowhere to show.)
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const end = configEnd > today ? configEnd : today;
   const oneDay = 86400000;
   const days = [];
 
-  for (let cursor = new Date(start); cursor <= end; cursor = new Date(cursor.getTime() + oneDay)) {
-    const key = isoDate(cursor);
+  for (let cursor = new Date(start); cursor <= end; cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + 1)) {
+    const key = localIsoDate(cursor);
     const count = Number(config.contributions[key] || 0);
     const level = contributionLevel(count);
     days.push(`<span class="gh-day l${level}" title="${escapeHtml(contributionTitle(cursor, count))}" data-c="${count}" data-d="${key}"></span>`);
   }
 
   const monthLabels = [];
-  let monthCursor = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1));
+  let monthCursor = new Date(start.getFullYear(), start.getMonth() + 1, 1);
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   while (monthCursor <= end) {
     const startColumn = Math.floor((monthCursor - start) / oneDay / 7) + 2;
-    const nextMonth = new Date(Date.UTC(monthCursor.getUTCFullYear(), monthCursor.getUTCMonth() + 1, 1));
+    const nextMonth = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1);
     const nextColumn = Math.floor((nextMonth - start) / oneDay / 7) + 2;
     const endColumn = Math.min(53, nextColumn - 1);
-    monthLabels.push(`<span class="gh-month" style="grid-column: ${startColumn} / ${endColumn}">${monthNames[monthCursor.getUTCMonth()]}</span>`);
+    monthLabels.push(`<span class="gh-month" style="grid-column: ${startColumn} / ${endColumn}">${monthNames[monthCursor.getMonth()]}</span>`);
     monthCursor = nextMonth;
   }
 
@@ -99,6 +116,8 @@ function renderContributionGraph(config) {
           <span class="gh-legend-cell l4" title="Very high"></span>
           <span>More</span>
         </div>
+        <span class="gh-stamp" title="Live data from GitHub events API (public)">init…</span>
+        <button class="gh-refresh" type="button" aria-label="Refresh from GitHub" title="Re-fetch from GitHub">↻</button>
       </div>
     </div>`;
 }
@@ -442,6 +461,137 @@ function renderSite() {
 }
 
 renderSite();
+
+/* ============================================================
+   Live GitHub contributions — fetch on load, update cells in place
+   - Hardcoded data in content.js renders the initial graph
+   - This block fetches real data from the public events API,
+     updates the cells in place, and shows a "live · updated X" stamp.
+   - Caches the result in localStorage for 1 hour to avoid rate limits.
+   - Falls back to the hardcoded render if the fetch fails.
+   ============================================================ */
+const GH_USERNAME = 'Junjie-Yao-Percy';
+const GH_CACHE_TTL_MS = 60 * 60 * 1000;  // 1 hour
+
+function ghCountEvent(event) {
+  // Approximate GitHub's contribution count from public events.
+  // Not 1:1 with GitHub's actual square (no GraphQL token = no per-commit
+  // detail), but covers the major contribution types: push, PR open,
+  // issue open, review, repo create.
+  switch (event.type) {
+    case 'PushEvent':              return 1;
+    case 'PullRequestEvent':
+      return event.payload?.action === 'opened' ? 1 : 0;
+    case 'IssuesEvent':
+      return event.payload?.action === 'opened' ? 1 : 0;
+    case 'PullRequestReviewEvent':
+      return event.payload?.action === 'submitted' ? 1 : 0;
+    case 'CreateEvent':
+      return event.payload?.ref_type === 'repository' ? 1 : 0;
+    default:                      return 0;
+  }
+}
+
+async function fetchGitHubContributions(username) {
+  const cacheKey = `gh-contrib-${username}`;
+  // Try cache first (within TTL)
+  try {
+    const raw = localStorage.getItem(cacheKey);
+    if (raw) {
+      const cached = JSON.parse(raw);
+      const age = Date.now() - cached.timestamp;
+      if (age < GH_CACHE_TTL_MS) {
+        return { contributions: cached.contributions, fromCache: true, age };
+      }
+    }
+  } catch (e) { /* ignore parse errors */ }
+
+  // Fetch from GitHub public events API
+  // (?per_page=100 gets ~3.3 months of activity; for a year of data this
+  //  is approximate, but good enough for the visual signal.)
+  const url = `https://api.github.com/users/${encodeURIComponent(username)}/events/public?per_page=100`;
+  try {
+    const response = await fetch(url, { headers: { 'Accept': 'application/vnd.github+json' } });
+    if (!response.ok) {
+      console.warn('GitHub events API returned', response.status, response.statusText);
+      return null;
+    }
+    const events = await response.json();
+    if (!Array.isArray(events)) return null;
+    const contributions = {};
+    for (const event of events) {
+      if (!event.created_at) continue;
+      const date = event.created_at.slice(0, 10);
+      const add = ghCountEvent(event);
+      if (add > 0) contributions[date] = (contributions[date] || 0) + add;
+    }
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({
+        timestamp: Date.now(),
+        contributions
+      }));
+    } catch (e) { /* localStorage might be unavailable */ }
+    return { contributions, fromCache: false, age: 0 };
+  } catch (e) {
+    console.warn('GitHub contributions fetch failed:', e);
+    return null;
+  }
+}
+
+function applyGitHubContributions(contributions) {
+  let updated = 0;
+  for (const [date, count] of Object.entries(contributions)) {
+    const cell = document.querySelector(`.gh-day[data-d="${date}"]`);
+    if (!cell) continue;
+    const level = contributionLevel(count);
+    cell.className = `gh-day l${level}`;
+    cell.setAttribute('title', contributionTitle(localDate(date), count));
+    cell.setAttribute('data-c', String(count));
+    updated++;
+  }
+  return updated;
+}
+
+function setGhStamp(text, isLive) {
+  const stamp = document.querySelector('.gh-stamp');
+  if (!stamp) return;
+  stamp.textContent = text;
+  if (isLive) stamp.classList.add('live');
+  else stamp.classList.remove('live');
+}
+
+async function refreshGitHubContributions(forceRefresh) {
+  if (forceRefresh) {
+    try { localStorage.removeItem(`gh-contrib-${GH_USERNAME}`); } catch (e) {}
+  }
+  setGhStamp('syncing with GitHub…');
+  const result = await fetchGitHubContributions(GH_USERNAME);
+  if (!result) {
+    setGhStamp('⚠ fetch failed — showing last cached data');
+    return;
+  }
+  const updated = applyGitHubContributions(result.contributions);
+  if (result.fromCache) {
+    const ageMin = Math.floor(result.age / 60000);
+    setGhStamp(`live · ${updated} recent events · cached ${ageMin}m ago`, true);
+  } else {
+    setGhStamp(`live · ${updated} recent events · just refreshed`, true);
+  }
+}
+
+// Kick off the first sync right after render. The hardcoded render is
+// already in the DOM, so this just patches the cells in place.
+refreshGitHubContributions(false);
+
+// Wire the manual refresh button.
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.gh-refresh');
+  if (!btn) return;
+  btn.classList.add('spinning');
+  refreshGitHubContributions(true).finally(() => {
+    setTimeout(() => btn.classList.remove('spinning'), 400);
+  });
+});
 
 /* ============================================================
    Interface polish: scroll progress, pointer aura, click sparks
