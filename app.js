@@ -552,15 +552,7 @@ setInterval(() => {
       root.style.setProperty('--my', `${event.clientY}px`);
     }, { passive: true });
 
-    document.addEventListener('click', event => {
-      const burst = document.createElement('span');
-      burst.className = 'click-burst';
-      burst.style.left = `${event.clientX}px`;
-      burst.style.top = `${event.clientY}px`;
-      burst.textContent = '✦';
-      document.body.appendChild(burst);
-      setTimeout(() => burst.remove(), 700);
-    });
+    
   }
 })();
 
