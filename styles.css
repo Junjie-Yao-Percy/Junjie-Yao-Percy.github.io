@@ -2021,30 +2021,6 @@
   font-size: 12px;
 }
 
-.click-burst {
-  position: fixed;
-  z-index: 999;
-  pointer-events: none;
-  width: 1px;
-  height: 1px;
-  color: var(--accent-6);
-  font-size: 20px;
-  line-height: 1;
-  text-shadow: 0 0 18px var(--accent-6), 18px -8px 0 rgba(249,115,22,0.85), -14px -14px 0 rgba(250,204,21,0.75), 10px 16px 0 rgba(16,185,129,0.75);
-  animation: click-burst .68s ease-out forwards;
-}
-
-@keyframes click-burst {
-  from {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(.55) rotate(0deg);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-50%, -92%) scale(1.45) rotate(32deg);
-  }
-}
-
 @media (max-width: 1180px) {
   .side-ribbon { display: none; }
 }
@@ -2058,7 +2034,6 @@
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
-  .click-burst { display: none; }
 }
 
 .noscript-message {
