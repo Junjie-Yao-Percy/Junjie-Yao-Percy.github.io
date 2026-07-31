@@ -1,0 +1,49 @@
+name: Refresh GitHub contribution calendar
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/refresh-github-contributions.yml'
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-contribution-calendar
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch contribution calendar
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_USERNAME: ${{ github.repository_owner }}
+        run: |
+          from="$(date -u -d '364 days ago' +%Y-%m-%dT00:00:00Z)"
+          to="$(date -u -d 'tomorrow' +%Y-%m-%dT00:00:00Z)"
+          mkdir -p data
+          gh api graphql \
+            -f query='query ContributionCalendar($login: String!, $from: DateTime!, $to: DateTime!) { user(login: $login) { contributionsCollection(from: $from, to: $to) { contributionCalendar { totalContributions weeks { contributionDays { date contributionCount } } } } } }' \
+            -F login="$GITHUB_USERNAME" \
+            -F from="$from" \
+            -F to="$to" > data/github-contributions.json
+          test "$(jq -r '.data.user.contributionsCollection.contributionCalendar.weeks | length' data/github-contributions.json)" -gt 0
+
+      - name: Commit changed calendar data
+        run: |
+          if git diff --quiet -- data/github-contributions.json; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/github-contributions.json
+          git commit -m 'chore: refresh GitHub contribution calendar'
+          git push

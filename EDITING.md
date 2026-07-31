@@ -19,6 +19,12 @@ Each list item is an independent JavaScript object. To add a new entry, copy a n
 
 Publication display data and citation data live in the same publication object, so a paper no longer needs to be updated in two unrelated parts of the website.
 
+## GitHub contribution calendar
+
+The contribution calendar is not edited in `content.js`. Its dates are generated from the visitor's current date, while `.github/workflows/refresh-github-contributions.yml` queries GitHub's contribution calendar every six hours and writes the result to `data/github-contributions.json`.
+
+The page loads that generated file automatically and checks for a newer deployed copy every 15 minutes. Do not manually edit `data/github-contributions.json`; the workflow will replace it.
+
 ## Files that normally should not be changed
 
 - `styles.css` — colors, layout, responsive behavior, animations

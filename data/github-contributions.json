@@ -1,0 +1,12 @@
+{
+  "data": {
+    "user": {
+      "contributionsCollection": {
+        "contributionCalendar": {
+          "totalContributions": 0,
+          "weeks": []
+        }
+      }
+    }
+  }
+}

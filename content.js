@@ -55,16 +55,7 @@ window.SITE_CONTENT = {
       { value: 2, label: 'Internships' },
       { value: 4, label: 'Patents' },
       { value: 4, label: 'Awards' }
-    ],
-    github: {
-      startDate: '2025-07-27',
-      endDate: '2026-07-28',
-      contributions: {
-        '2026-07-15': 1,
-        '2026-07-27': 33,
-        '2026-07-28': 5
-      }
-    }
+    ]
   },
 
   experience: [
