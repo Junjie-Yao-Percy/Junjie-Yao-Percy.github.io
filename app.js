@@ -471,7 +471,8 @@ renderSite();
    - Falls back to the hardcoded render if the fetch fails.
    ============================================================ */
 const GH_USERNAME = 'Junjie-Yao-Percy';
-const GH_CACHE_TTL_MS = 60 * 60 * 1000;  // 1 hour
+const GH_CACHE_TTL_MS = 5 * 60 * 1000;        // 5 min — short enough that the auto-poll below actually re-fetches
+const GH_AUTO_REFRESH_MS = 10 * 60 * 1000;     // 10 min — background poll interval
 
 function ghCountEvent(event) {
   // Approximate GitHub's contribution count from public events.
@@ -560,11 +561,13 @@ function setGhStamp(text, isLive) {
   else stamp.classList.remove('live');
 }
 
-async function refreshGitHubContributions(forceRefresh) {
+async function refreshGitHubContributions(forceRefresh, silent = false) {
   if (forceRefresh) {
     try { localStorage.removeItem(`gh-contrib-${GH_USERNAME}`); } catch (e) {}
   }
-  setGhStamp('syncing with GitHub…');
+  // `silent` skips the "syncing..." flash — used by background timers
+  // (the cells still update and the stamp still shows the new refresh time).
+  if (!silent) setGhStamp('syncing with GitHub…');
   const result = await fetchGitHubContributions(GH_USERNAME);
   if (!result) {
     setGhStamp('⚠ fetch failed — showing last cached data');
@@ -582,6 +585,22 @@ async function refreshGitHubContributions(forceRefresh) {
 // Kick off the first sync right after render. The hardcoded render is
 // already in the DOM, so this just patches the cells in place.
 refreshGitHubContributions(false);
+
+// Auto-refresh — keep the graph fresh without the user doing anything.
+// Triggers:
+//   1) tab becomes visible (user switches back) — user is paying attention,
+//      so show the "syncing…" stamp
+//   2) window regains focus — same
+//   3) every GH_AUTO_REFRESH_MS while tab is visible — silent (no flash)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') refreshGitHubContributions(false);
+});
+window.addEventListener('focus', () => {
+  refreshGitHubContributions(false);
+});
+setInterval(() => {
+  if (document.visibilityState === 'visible') refreshGitHubContributions(false, true);
+}, GH_AUTO_REFRESH_MS);
 
 // Wire the manual refresh button.
 document.addEventListener('click', (e) => {
