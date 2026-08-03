@@ -49,7 +49,7 @@ window.SITE_CONTENT = {
       'Edge AI',
       'Embodied AI'
     ],
-    currentlyHtml: 'Research intern at <span class="org">Guangming Lab (Shenzhen)</span> on vLLM-Ascend adaptation, and at <span class="org">Shenzhen Loop Area Institute</span> on embodied-AI simulation for road maintenance.',
+    currentlyHtml: 'Research intern at <span class="org">Guangdong Laboratory of Artificial Intelligence and Digital Economy (SZ)</span> on vLLM-Ascend adaptation, and at <span class="org">Shenzhen Loop Area Institute</span> on embodied-AI simulation for road maintenance.',
     stats: [
       { value: 5, label: 'Publications' },
       { value: 2, label: 'Internships' },
@@ -60,7 +60,7 @@ window.SITE_CONTENT = {
 
   experience: [
     {
-      organization: 'Guangming Lab — AI & Digital Economy (Shenzhen)',
+      organization: 'Guangdong Laboratory of Artificial Intelligence and Digital Economy (SZ)',
       period: '2026-05 — Present',
       role: 'Research Intern · LLM Inference on Ascend NPU',
       bulletsHtml: [
